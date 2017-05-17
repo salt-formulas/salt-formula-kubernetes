@@ -45,6 +45,9 @@ parameters:
         helm:
           enabled: False
           tiller_image: gcr.io/kubernetes-helm/tiller:v2.3.0
+        calico_policy:
+          enabled: False
+          image: calico/kube-policy-controller:v0.5.4
       token:
         admin: ${_param:kubernetes_admin_token}
         kubelet: ${_param:kubernetes_kubelet_token}

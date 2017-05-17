@@ -8,6 +8,18 @@ addon-dir-create:
     - group: root
     - mode: 0755
 
+{%- if master.addons.calico_policy.enabled and master.network.engine == "calico" %}
+/etc/kubernetes/addons/calico-policy/calico-policy-controller.yml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/calico-policy/calico-policy-controller.yml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
+{% endif %}
+
+
 {%- if master.addons.helm.enabled %}
 /etc/kubernetes/addons/helm/helm-tiller-deploy.yml:
   file.managed:

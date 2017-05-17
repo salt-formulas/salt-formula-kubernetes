@@ -24,6 +24,8 @@ kubernetes:
         tiller_image: gcr.io/kubernetes-helm/tiller:v2.2.3
       netchecker:
         enabled: true
+      calico_policy:
+        enabled: true
     admin:
       password: password
       username: admin

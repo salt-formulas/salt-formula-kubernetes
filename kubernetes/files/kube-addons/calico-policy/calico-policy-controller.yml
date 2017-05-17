@@ -1,0 +1,64 @@
+{%- from "kubernetes/map.jinja" import master with context %}
+apiVersion: extensions/v1beta1
+kind: ReplicaSet
+metadata:
+  name: calico-policy-controller
+  namespace: {{ master.addons.calico_policy.namespace }}
+  labels:
+    k8s-app: calico-policy
+    kubernetes.io/cluster-service: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      kubernetes.io/cluster-service: "true"
+      k8s-app: {{ master.addons.calico_policy.namespace }}
+  template:
+    metadata:
+      name: calico-policy-controller
+      namespace: {{ master.addons.calico_policy.namespace }}
+      labels:
+        kubernetes.io/cluster-service: "true"
+        k8s-app: calico-policy
+    spec:
+      hostNetwork: true
+      containers:
+        - name: calico-policy-controller
+          image: {{ master.addons.calico_policy.image }}
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 100m
+              memory: 256M
+            requests:
+              cpu: 30m
+              memory: 64M
+          env:
+            - name: ETCD_ENDPOINTS
+              value: "{% for member in pool.network.etcd.members %}http{% if pool.network.etcd.get('ssl', {}).get('enabled') %}s{% endif %}://{{ member.host }}:{{ member.port }}{% if not loop.last %},{% endif %}{% endfor %}"
+            - name: ETCD_CA_CERT_FILE
+              value: "/var/lib/etcd/ca.pem"
+            - name: ETCD_CERT_FILE
+              value: "/var/lib/etcd/etcd-client.pem"
+            - name: ETCD_KEY_FILE
+              value: "/var/lib/etcd/etcd-client.pem"
+            # Location of the Kubernetes API - this shouldn't need to be
+            # changed so long as it is used in conjunction with
+            # CONFIGURE_ETC_HOSTS="true".
+            - name: K8S_API
+              value: "https://kubernetes.default"
+            # Configure /etc/hosts within the container to resolve
+            # the kubernetes.default Service to the correct clusterIP
+            # using the environment provided by the kubelet.
+            # This removes the need for KubeDNS to resolve the Service.
+            - name: CONFIGURE_ETC_HOSTS
+              value: "true"
+          volumeMounts:
+          - mountPath: /var/lib/etcd/
+            name: etcd-certs
+            readOnly: true
+      volumes:
+      - hostPath:
+          path: /var/lib/etcd
+        name: etcd-certs
+
