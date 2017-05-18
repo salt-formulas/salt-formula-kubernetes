@@ -43,6 +43,17 @@ Enable helm-tiller addon
             helm:
               enabled: true
 
+Enable calico-policy addon
+
+.. code-block:: yaml
+
+    parameters:
+      kubernetes:
+        master:
+          addons:
+            calico_policy:
+              enabled: true
+
 Enable netchecker addon
 
 .. code-block:: yaml
@@ -259,7 +270,7 @@ On pools:
 Kubernetes control plane running in systemd
 -------------------------------------------
 
-By default kube-apiserver, kube-scheduler, kube-controllermanager, kube-proxy, etcd running in docker containers through manifests. For stable production environment this should be run in systemd. 
+By default kube-apiserver, kube-scheduler, kube-controllermanager, kube-proxy, etcd running in docker containers through manifests. For stable production environment this should be run in systemd.
 
 .. code-block:: yaml
 
@@ -379,6 +390,27 @@ Running with secured etcd:
           etcd:
             ssl:
               enabled: true
+
+Running with calico-policy controller:
+
+.. code-block:: yaml
+
+    kubernetes:
+      pool:
+        network:
+          engine: calico
+          addons:
+            calico_policy:
+              enabled: true
+
+      master:
+        network:
+          engine: calico
+          addons:
+            calico_policy:
+              enabled: true
+
+
 
 Enable Prometheus metrics in Felix
 

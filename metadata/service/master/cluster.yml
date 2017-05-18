@@ -57,6 +57,9 @@ parameters:
           port: 80
           agent_image: quay.io/l23network/k8s-netchecker-agent:v1.0
           server_image: quay.io/l23network/k8s-netchecker-server:v1.0
+        calico_policy:
+          enabled: False
+          image: calico/kube-policy-controller:v0.5.4
       token:
         admin: ${_param:kubernetes_admin_token}
         kubelet: ${_param:kubernetes_kubelet_token}
