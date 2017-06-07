@@ -1,0 +1,49 @@
+---
+driver:
+  name: docker
+  hostname: kubernetes.ci.local
+  use_sudo: false
+
+provisioner:
+  name: salt_solo
+  salt_install: bootstrap
+  salt_bootstrap_url: https://bootstrap.saltstack.com
+  salt_version: latest
+  require_chef: false
+  log_level: error
+  formula: kubernetes
+  grains:
+    noservices: True
+  state_top:
+    base:
+      "*":
+        - kubernetes
+  pillars:
+    top.sls:
+      base:
+        "*":
+          - kubernetes
+
+verifier:
+  name: inspec
+  sudo: true
+
+
+platforms:
+  - name: <%=ENV['PLATFORM'] || 'ubuntu-xenial'%>
+    driver_config:
+      image: <%=ENV['PLATFORM'] || 'trevorj/salty-whales:xenial'%>
+      platform: ubuntu
+
+suites:
+
+  - name: master_cluster
+    provisioner:
+      pillars-from-files:
+        kubernetes.sls: tests/pillar/master_cluster.sls
+
+  # - name: pool_cluster
+  #   provisioner:
+  #     pillars-from-files:
+  #       kubernetes.sls: tests/pillar/pool_cluster.sls
+# vim: ft=yaml sw=2 ts=2 sts=2 tw=125

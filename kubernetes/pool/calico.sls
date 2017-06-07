@@ -9,6 +9,9 @@
 copy-calico-ctl:
   dockerng.running:
     - image: {{ pool.network.calicoctl.image }}
+    {% if grains.noservices is defined %}
+    - onlyif: {% if grains.get('noservices', "True") %}"True"{% else %}False{% endif %}
+    {% endif %}
 
 copy-calico-ctl-cmd:
   cmd.run:
@@ -28,6 +31,9 @@ copy-calico-ctl-cmd:
 copy-calico-node:
   dockerng.running:
     - image: {{ pool.network.get('image', 'calico/node') }}
+    {% if grains.noservices is defined %}
+    - onlyif: {% if grains.get('noservices', "True") %}"True"{% else %}False{% endif %}
+    {% endif %}
 
 copy-bird-cl-cmd:
   cmd.run:
@@ -51,6 +57,9 @@ copy-calico-cni:
     - binds:
       - /tmp/calico/:/tmp/calico/
     - force: True
+    {% if grains.noservices is defined %}
+    - onlyif: {% if grains.get('noservices', "True") %}"True"{% else %}False{% endif %}
+    {% endif %}
 
 {%- for filename in ['calico', 'calico-ipam'] %}
 

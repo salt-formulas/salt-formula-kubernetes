@@ -31,18 +31,21 @@ hyperkube-copy:
     - binds:
       - /tmp/hyperkube/:/tmp/hyperkube/
     - force: True
+    {% if grains.noservices is defined %}
+    - onlyif: {% if grains.get('noservices', "True") %}"True"{% else %}False{% endif %}
+    {% endif %}
     - require:
       - file: /tmp/hyperkube
 
 /usr/bin/hyperkube:
   file.managed:
-     - source: /tmp/hyperkube/hyperkube
-     - mode: 751
-     - makedirs: true
-     - user: root
-     - group: root
-     - require:
-       - dockerng: hyperkube-copy
+    - source: /tmp/hyperkube/hyperkube
+    - mode: 751
+    - makedirs: true
+    - user: root
+    - group: root
+    - require:
+      - dockerng: hyperkube-copy
 
 /usr/bin/kubectl:
   file.symlink:
@@ -66,6 +69,7 @@ hyperkube-copy:
     - user: root
     - group: root
     - mode: 0751
+    - makedirs: true
 
 {%- if not pillar.kubernetes.pool is defined %}
 
@@ -95,6 +99,7 @@ manifest_dir_create:
     - user: root
     - group: root
     - mode: 0751
+    - makedirs: true
 
 /etc/kubernetes/kubelet.kubeconfig:
   file.managed:
@@ -109,6 +114,9 @@ kubelet_service:
   service.running:
   - name: kubelet
   - enable: True
+  {% if grains.noservices is defined %}
+  - onlyif: {% if grains.get('noservices', "True") %}"True"{% else %}False{% endif %}
+  {% endif %}
   - watch:
     - file: /etc/default/kubelet
     - file: /usr/bin/hyperkube
