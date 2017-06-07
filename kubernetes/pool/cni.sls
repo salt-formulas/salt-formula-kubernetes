@@ -8,7 +8,7 @@
   file.directory:
     - user: root
     - group: root
-
+{%- if not grains.get('noservices', False) %}
 copy-network-cni:
   dockerng.running:
     - image: {{ common.hyperkube.image }}
@@ -18,6 +18,7 @@ copy-network-cni:
     - force: True
     - require:
         - file: /tmp/cni/
+{%- endif %}
 
 {%- for filename in ['cnitool', 'flannel', 'tuning', 'bridge', 'ipvlan', 'loopback', 'macvlan', 'ptp', 'dhcp', 'host-local', 'noop'] %}
 /opt/cni/bin/{{ filename }}:
@@ -29,8 +30,10 @@ copy-network-cni:
     - makedirs: True
     - watch_in:
       - service: kubelet_service
+    {%- if not grains.get('noservices', False) %}
     - require:
       - dockerng: copy-network-cni
+    {%- endif %}
 
 {%- endfor %}
 
