@@ -29,6 +29,7 @@ kubernetes:
         interval: 60
         server_image: image
         agent_image: image
+        agent_probeurls: "http://ipinfo.io"
       calico_policy:
         enabled: true
         namespace: kube-system

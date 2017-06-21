@@ -20,6 +20,10 @@ spec:
         - name: netchecker-agent
           image: {{ master.addons.netchecker.agent_image }}
           env:
+            - name: MY_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
             - name: MY_POD_NAME
               valueFrom:
                 fieldRef:
@@ -29,3 +33,5 @@ spec:
             - "-alsologtostderr=true"
             - "-serverendpoint=netchecker:{{ master.addons.netchecker.port }}"
             - "-reportinterval={{ master.addons.netchecker.interval }}"
+            - "-probeurls={{ master.addons.netchecker.agent_probeurls }}"
+          imagePullPolicy: Always
