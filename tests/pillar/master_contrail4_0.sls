@@ -30,6 +30,7 @@ kubernetes:
         interval: 60
         server_image: image
         agent_image: image
+        agent_probeurls: "http://ipinfo.io"
     admin:
       password: password
       username: admin
@@ -65,7 +66,7 @@ kubernetes:
         - host: 127.0.0.1
         - host: 127.0.0.1
         - host: 127.0.0.1
-      collector:  
+      collector:
         members:
         - host: 127.0.0.1
         - host: 127.0.0.1

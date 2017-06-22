@@ -58,8 +58,9 @@ parameters:
           interval: 60
           namespace: netchecker
           port: 80
-          agent_image: quay.io/l23network/k8s-netchecker-agent:v1.0
-          server_image: quay.io/l23network/k8s-netchecker-server:v1.0
+          agent_image: mirantis/k8s-netchecker-agent:v1.1.0
+          server_image: mirantis/k8s-netchecker-server:v1.1.0
+          agent_probeurls: "http://ipinfo.io"
         calico_policy:
           enabled: False
           image: calico/kube-policy-controller:v0.5.4
