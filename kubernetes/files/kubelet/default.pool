@@ -14,14 +14,14 @@ DAEMON_ARGS="\
 --v={{ pool.get('verbosity', 2) }} \
 {%- if pillar.kubernetes.master is defined %}
 --node-labels=node-role.kubernetes.io/master=true \
-{%- if version|float >= 1.8 %}
---fail-swap-on={{ pool.kubelet.fail_on_swap }} \
-{%- endif %}
 {%-   if pillar.kubernetes.get('master', {}).get('unschedulable', 'false') %}
 --register-with-taints=node-role.kubernetes.io/master=:NoSchedule \
 {%-    endif -%}
 {%- else %}
 --node-labels=node-role.kubernetes.io/node=true \
+{%- endif %}
+{%- if version|float >= 1.8 %}
+--fail-swap-on={{ pool.kubelet.fail_on_swap }} \
 {%- endif %}
 {%- if pool.network.engine in ['calico', 'opencontrail'] %}
 --network-plugin=cni \
