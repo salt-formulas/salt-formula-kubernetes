@@ -323,21 +323,25 @@ addon-dir-create:
 
 {%- if common.addons.get('dashboard', {'enabled': False}).enabled %}
 
-/etc/kubernetes/addons/dashboard/dashboard-service.yaml:
+{%- set dashboard_resources = ['deployment', 'secret', 'service', 'serviceaccount'] %}
+
+{%- if 'RBAC' in master.auth.get('mode', "") %}
+
+{%- set dashboard_resources = dashboard_resources + ['role', 'rolebinding'] %}
+
+{%- endif %}
+
+{%- for resource in dashboard_resources %}
+
+/etc/kubernetes/addons/dashboard/dashboard-{{ resource }}.yaml:
   file.managed:
-    - source: salt://kubernetes/files/kube-addons/dashboard/dashboard-service.yaml
+    - source: salt://kubernetes/files/kube-addons/dashboard/dashboard-{{ resource }}.yaml
     - template: jinja
     - group: root
     - dir_mode: 755
     - makedirs: True
 
-/etc/kubernetes/addons/dashboard/dashboard-controller.yaml:
-  file.managed:
-    - source: salt://kubernetes/files/kube-addons/dashboard/dashboard-controller.yaml
-    - template: jinja
-    - group: root
-    - dir_mode: 755
-    - makedirs: True
+{%- endfor %}
 
 {% endif %}
 

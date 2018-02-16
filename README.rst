@@ -447,7 +447,8 @@ Dashboard public IP must be configured when Contrail network is used:
     kubernetes:
       common:
         addons:
-          public_ip: 1.1.1.1
+          dashboard:
+            public_ip: 1.1.1.1
 
 Kubernetes control plane running in systemd
 -------------------------------------------
