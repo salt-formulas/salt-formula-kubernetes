@@ -8,7 +8,6 @@ Build-Depends: debhelper (>= 9),
                openstack-pkg-tools,
 Build-Depends-Indep: python-all,
                      python-yaml,
-                     salt-master,
 Standards-Version: 3.9.6
 Homepage: https://wiki.openstack.org/wiki/OpenStackSalt
 Vcs-Browser: https://anonscm.debian.org/cgit/openstack/salt-formula-kubernetes.git/
@@ -16,9 +15,7 @@ Vcs-Git: https://anonscm.debian.org/git/openstack/salt-formula-kubernetes.git
 
 Package: salt-formula-kubernetes
 Architecture: all
-Depends: reclass,
-         salt-master,
-         ${misc:Depends},
+Depends: ${misc:Depends},
 Description: Salt formula for Kubernetes
  Salt is a powerful remote execution manager that can be used to
  administer servers in a fast and efficient way.
