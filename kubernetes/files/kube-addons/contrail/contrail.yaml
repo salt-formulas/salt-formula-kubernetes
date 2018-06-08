@@ -1,5 +1,5 @@
 apiVersion: apps/v1beta2
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: opencontrail
   namespace: kube-system
@@ -8,7 +8,6 @@ metadata:
     kubernetes.io/cluster-service: "true"
     addonmanager.kubernetes.io/mode: Reconcile
 spec:
-  replicas: 3
   selector:
     matchLabels:
       app: opencontrail
@@ -19,6 +18,31 @@ spec:
     spec:
       hostNetwork: true
       containers:
+      - name: rabbitmq
+        image: rabbitmq:3.6.6-management-alpine
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - >
+                if [ -z "$(grep rabbitmq /etc/resolv.conf)" ]; then
+                  sed "s/^search \([^ ]\+\)/search rabbitmq.\1 \1/" /etc/resolv.conf > /etc/resolv.conf.new;
+                  cat /etc/resolv.conf.new > /etc/resolv.conf;
+                  rm /etc/resolv.conf.new;
+                fi;
+                until rabbitmqctl node_health_check; do sleep 1; done;
+                if [[ "$HOSTNAME" != "ctl01" && -z "$(rabbitmqctl cluster_status | grep ctl01)" ]]; then
+                  rabbitmqctl stop_app;
+                  rabbitmqctl join_cluster rabbit@ctl01;
+                  rabbitmqctl start_app;
+                fi;
+                rabbitmqctl set_policy ha-all "." '{"ha-mode":"exactly","ha-params":3,"ha-sync-mode":"automatic"}'
+        env:
+        - name: RABBITMQ_ERLANG_COOKIE
+          value: YTQMGYEHFATZPDKPOCXX
+
       - name: opencontrail-controller
         image: docker-prod-local.artifactory.mirantis.com/opencontrail-oc40/opencontrail-controller
         securityContext:
@@ -98,31 +122,6 @@ spec:
           mountPath: /etc/redis/redis.conf
         securityContext:
           privileged: true
-
-      - name: rabbitmq
-        image: rabbitmq:3.6.6-management-alpine
-        lifecycle:
-          postStart:
-            exec:
-              command:
-              - /bin/sh
-              - -c
-              - >
-                if [ -z "$(grep rabbitmq /etc/resolv.conf)" ]; then
-                  sed "s/^search \([^ ]\+\)/search rabbitmq.\1 \1/" /etc/resolv.conf > /etc/resolv.conf.new;
-                  cat /etc/resolv.conf.new > /etc/resolv.conf;
-                  rm /etc/resolv.conf.new;
-                fi;
-                until rabbitmqctl node_health_check; do sleep 1; done;
-                if [[ "$HOSTNAME" != "ctl01" && -z "$(rabbitmqctl cluster_status | grep ctl01)" ]]; then
-                  rabbitmqctl stop_app;
-                  rabbitmqctl join_cluster rabbit@ctl01;
-                  rabbitmqctl start_app;
-                fi;
-                rabbitmqctl set_policy ha-all "." '{"ha-mode":"exactly","ha-params":3,"ha-sync-mode":"automatic"}'
-        env:
-        - name: RABBITMQ_ERLANG_COOKIE
-          value: YTQMGYEHFATZPDKPOCXX
 
       volumes:
       # analytics / analyticsdb / controller /
