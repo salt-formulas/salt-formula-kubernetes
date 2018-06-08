@@ -155,8 +155,8 @@ server:
         severity: warning
         service: kubernetes
       annotations:
-        summary: "Failed to get the container metrics"
-        description: "Prometheus was not able to scrape metrics from the container on the {{ $labels.instance }} instance."
+        summary: "Failed to get Kubernetes container metrics"
+        description: "Prometheus was not able to scrape metrics from the container on the {{ $labels.instance }} Kubernetes instance."
     {% endraw %}
     KubernetesProcessDown:
       if: >-
@@ -168,7 +168,7 @@ server:
         service: kubernetes
       annotations:
         summary: "Kubernetes {{ $labels.process_name }} process is down"
-        description: "Kubernetes {{ $labels.process_name }} process on the {{ $labels.host }} node is down for at least 2 minutes."
+        description: "Kubernetes {{ $labels.process_name }} process on the {{ $labels.host }} node is down for 2 minutes."
     {% endraw %}
     KubernetesProcessDownMinor:
       if: >-
@@ -179,9 +179,9 @@ server:
         severity: minor
         service: kubernetes
       annotations:
-        summary: "{% endraw %}{{ instance_minor_threshold_percent * 100 }}%{% raw %} of Kubernetes {{ $labels.process_name }} process instances are down"
+        summary: "{% endraw %}{{ instance_minor_threshold_percent * 100 }}%{% raw %} of Kubernetes {{ $labels.process_name }} processes are down"
         description: >-
-          {{ $value }} of Kubernetes {{ $labels.process_name }} process instances are down {% endraw %}(at least {{ instance_minor_threshold_percent * 100 }}%) for at least 2 minutes.
+          {{ $value }} of Kubernetes {{ $labels.process_name }} processes (>= {% endraw %} {{ instance_minor_threshold_percent * 100 }}%) are down for 2 minutes.
     KubernetesProcessDownMajor:
       if: >-
         count(procstat_running{process_name=~"hyperkube-.*"} == 0) by (process_name) > count(procstat_running{process_name=~"hyperkube-.*"}) by (process_name) * {{ instance_major_threshold_percent }}
@@ -190,9 +190,9 @@ server:
         severity: major
         service: kubernetes
       annotations:
-        summary: "{{ instance_major_threshold_percent * 100 }}%{% raw %} of Kubernetes {{ $labels.process_name }} process instances are down"
+        summary: "{{ instance_major_threshold_percent * 100 }}%{% raw %} of Kubernetes {{ $labels.process_name }} processes are down"
         description: >-
-          {{ $value }} of Kubernetes {{ $labels.process_name }} process instances are down {% endraw %}(at least {{ instance_major_threshold_percent * 100 }}%) for at least 2 minutes.
+          {{ $value }} of Kubernetes {{ $labels.process_name }} processes (>= {% endraw %} {{ instance_major_threshold_percent * 100 }}%) are down for 2 minutes.
     KubernetesProcessOutage:
       if: >-
         count(procstat_running{process_name=~"hyperkube-.*"}) by (process_name) == count(procstat_running{process_name=~"hyperkube-.*"} == 0) by (process_name)
@@ -203,7 +203,7 @@ server:
         service: kubernetes
       annotations:
         summary: "Kubernetes {{ $labels.process_name }} cluster outage"
-        description: "All Kubernetes {{ $labels.process_name }} process instances are down for at least 2 minutes."
+        description: "All Kubernetes {{ $labels.process_name }} processes are down for 2 minutes."
     {% endraw %}
 {%- if network.get('calico', {}).get('enabled', False) %}
     CalicoProcessDown:
@@ -216,7 +216,7 @@ server:
         service: calico
       annotations:
         summary: "Calico {{ $labels.process_name }} process is down"
-        description: "Calico {{ $labels.process_name }} process on the {{ $labels.host }} node is down for at least 2 minutes."
+        description: "Calico {{ $labels.process_name }} process on the {{ $labels.host }} node is down for 2 minutes."
     {% endraw %}
     CalicoProcessDownMinor:
       if: >-
@@ -226,9 +226,9 @@ server:
         severity: minor
         service: calico
       annotations:
-        summary: "{{ instance_minor_threshold_percent * 100 }}%{% raw %} of Calico {{ $labels.process_name }} process instances are down"
+        summary: "{{ instance_minor_threshold_percent * 100 }}%{% raw %} of Calico {{ $labels.process_name }} processes are down"
         description: >-
-          {{ $value }} of Calico {{ $labels.process_name }} process instances are down {% endraw %}(at least {{ instance_minor_threshold_percent * 100 }}%) for at least 2 minutes.
+          {{ $value }} of Calico {{ $labels.process_name }} processes (>= {% endraw %} {{ instance_minor_threshold_percent * 100 }}%) are down for 2 minutes.
     CalicoProcessDownMajor:
       if: >-
         count(procstat_running{process_name=~"calico-felix|bird|bird6|confd"} == 0) by (process_name) > count(procstat_running{process_name=~"calico-felix|bird|bird6|confd"}) by (process_name) * {{ instance_major_threshold_percent }}
@@ -237,9 +237,9 @@ server:
         severity: major
         service: calico
       annotations:
-        summary: "{{ instance_major_threshold_percent * 100 }}%{% raw %} of Calico {{ $labels.process_name }} process instances are down"
+        summary: "{{ instance_major_threshold_percent * 100 }}%{% raw %} of Calico {{ $labels.process_name }} processes are down"
         description: >-
-          {{ $value }} of Calico {{ $labels.process_name }} process instances are down {% endraw %}(at least {{ instance_major_threshold_percent * 100 }}%) for at least 2 minutes.
+          {{ $value }} of Calico {{ $labels.process_name }} processes (>= {% endraw %} {{ instance_major_threshold_percent * 100 }}%) are down for 2 minutes.
     CalicoProcessOutage:
       if: >-
         count(procstat_running{process_name=~"calico-felix|bird|bird6|confd"}) by (process_name) == count(procstat_running{process_name=~"calico-felix|bird|bird6|confd"} == 0) by (process_name)
@@ -250,6 +250,6 @@ server:
         service: calico
       annotations:
         summary: "Calico {{ $labels.process_name }} cluster outage"
-        description: "All Calico {{ $labels.process_name }} process instances are down for at least 2 minutes."
+        description: "All Calico {{ $labels.process_name }} processes are down for 2 minutes."
     {% endraw %}
 {% endif %}
