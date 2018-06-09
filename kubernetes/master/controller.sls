@@ -147,7 +147,7 @@ kubernetes_basic_auth:
 {%- if salt['pkg.version_cmp'](version,'1.8') >= 0 %}
         --feature-gates=MountPropagation=true
 {%- endif %}
-{%- if version|float >= 1.9 %}
+{%- if salt['pkg.version_cmp'](version,'1.9') >= 0 %}
         --endpoint-reconciler-type={{ master.apiserver.get('endpoint-reconciler', 'lease') }}
 {%- else %}
         --apiserver-count={{ master.apiserver.get('count', 1) }}
