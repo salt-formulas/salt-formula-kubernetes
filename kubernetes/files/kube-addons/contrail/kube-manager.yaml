@@ -1,3 +1,5 @@
+{%- from "kubernetes/map.jinja" import common with context -%}
+---
 apiVersion: apps/v1beta2
 kind: DaemonSet
 metadata:
@@ -19,7 +21,7 @@ spec:
       hostNetwork: true
       containers:
       - name: opencontrail-kube-manager
-        image: docker-prod-local.artifactory.mirantis.com/opencontrail-oc40/opencontrail-kube-manager
+        image: docker-prod-local.artifactory.mirantis.com/opencontrail-oc40/opencontrail-kube-manager:{{ common.addons.get('contrail',{}).get('contrail_version',"latest") }}
         securityContext:
           privileged: true
         lifecycle:
