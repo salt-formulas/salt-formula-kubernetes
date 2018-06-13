@@ -54,7 +54,7 @@ spec:
           postStart:
             exec:
               command:
-              - /bin/shm
+              - /bin/sh
               - -c
               - >
                 service rabbitmq-server stop;
