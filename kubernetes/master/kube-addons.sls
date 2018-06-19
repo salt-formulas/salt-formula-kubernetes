@@ -9,6 +9,16 @@ addon-dir-create:
     - group: root
     - mode: 0755
 
+{%- if common.addons.get('metallb', {}).get('enabled', False) %}
+/etc/kubernetes/addons/metallb/metallb.yaml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/metallb/metallb.yaml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+{% endif %}
+
 {%- if master.network.get('flannel', {}).get('enabled', False) %}
 /etc/kubernetes/addons/flannel/flannel.yml:
   file.managed:

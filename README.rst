@@ -476,6 +476,22 @@ Because k8s services run under kube user without root privileges, there is need 
         apiserver:
           secure_port: 8081
 
+Kubernetes with MetalLB
+-----------------------
+
+On Master:
+
+.. code-block:: yaml
+
+    kubernetes:
+      common:
+        addons:
+          metallb:
+            enabled: true
+            addresses:
+            - 172.16.10.150-172.16.10.180
+            - 172.16.10.192/26
+
 Kubernetes with Flannel
 -----------------------
 
