@@ -24,6 +24,11 @@ spec:
         image: docker-prod-local.artifactory.mirantis.com/opencontrail-oc40/opencontrail-kube-manager:{{ common.addons.get('contrail',{}).get('contrail_version',"latest") }}
         securityContext:
           privileged: true
+        env:
+        - name: CONTRAIL_UID
+          value: {{ salt['user.info']('contrail').get('uid', 0) }}
+        - name: CONTRAIL_GID
+          value: {{ salt['group.info']('contrail').get('gid', 0) }}
         lifecycle:
           postStart:
             exec:
@@ -40,6 +45,10 @@ spec:
           mountPath: /etc/kubernetes
         - name: etc-contrail
           mountPath: /etc/contrail
+        - name: contrail-logs
+          mountPath: /var/log/contrail
+        - name: journal-kube-manager
+          mountPath: /var/log/journal
 
       volumes:
       - name: etc-kubernetes
@@ -50,6 +59,13 @@ spec:
         hostPath:
           path: /etc/contrail
           type: Directory
+      - name: contrail-logs
+        hostPath:
+          path: /var/log/contrail
+      - name: journal-kube-manager
+        hostPath:
+          path:  /var/log/journal/contrail-kube-manager
+          type: DirectoryOrCreate
 
       nodeSelector:
         "node-role.kubernetes.io/master": "true"

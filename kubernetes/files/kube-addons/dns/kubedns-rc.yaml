@@ -156,3 +156,8 @@ spec:
             cpu: 10m
       dnsPolicy: Default  # Don't use cluster DNS.
       serviceAccountName: kube-dns
+      {%- if salt['pillar.get']('kubernetes').get('master', {}).get('network', {}).get('opencontrail', {}).get('enabled', false) %}
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/node
+      {%- endif %}
