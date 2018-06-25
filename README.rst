@@ -492,6 +492,35 @@ On Master:
             - 172.16.10.150-172.16.10.180
             - 172.16.10.192/26
 
+Kubernetes with SRIOV
+-----------------------
+
+On Master:
+
+.. code-block:: yaml
+
+    kubernetes:
+      master:
+        network:
+          sriov:
+            enabled: true
+            interface: eno2
+            subnet: 10.55.208.0/24
+            gateway: 10.55.208.1
+
+On pools:
+
+.. code-block:: yaml
+
+    kubernetes:
+      pool:
+        network:
+          sriov:
+            enabled: true
+            interface: eno2
+            subnet: 10.55.208.0/24
+            gateway: 10.55.208.1
+
 Kubernetes with Flannel
 -----------------------
 
