@@ -1,0 +1,2 @@
+Test-Command: cd tests && ./run_tests.sh
+Restrictions: allow-stderr

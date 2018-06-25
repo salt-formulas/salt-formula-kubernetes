@@ -1,0 +1,7 @@
+#!/usr/bin/make -f
+
+include /usr/share/openstack-pkg-tools/pkgos.make
+
+%:
+	dh $@
+
