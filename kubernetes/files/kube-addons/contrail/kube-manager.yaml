@@ -26,9 +26,9 @@ spec:
           privileged: true
         env:
         - name: CONTRAIL_UID
-          value: {{ salt['user.info']('contrail').get('uid', 0) }}
+          value: "{{ salt['user.info']('contrail').get('uid', 0) }}"
         - name: CONTRAIL_GID
-          value: {{ salt['group.info']('contrail').get('gid', 0) }}
+          value: "{{ salt['group.info']('contrail').get('gid', 0) }}"
         lifecycle:
           postStart:
             exec:
