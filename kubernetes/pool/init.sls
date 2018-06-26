@@ -13,6 +13,9 @@ include:
 {%- if pool.network.get('genie', {}).get('enabled', False) %}
 - kubernetes.pool.genie
 {%- endif %}
+{%- if pool.network.get('sriov', {}).get('enabled', False) %}
+- kubernetes.pool.sriov
+{%- endif %}
 {%- if pool.get('kube_proxy', {}).get('enabled', True) %}
 - kubernetes.pool.kube-proxy
 {%- endif %}

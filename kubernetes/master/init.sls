@@ -18,6 +18,9 @@ include:
 - kubernetes.master.genie
 {%- endif %}
 {%- endif %}
+{%- if master.network.get('sriov', {}).get('enabled', False) %}
+- kubernetes.master.sriov
+{%- endif %}
 {%- if master.storage.get('engine', 'none') == 'glusterfs' %}
 - kubernetes.master.glusterfs
 {%- endif %}
