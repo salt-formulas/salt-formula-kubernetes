@@ -16,28 +16,13 @@
         default_plugin: {{ pool.network.genie.default_plugin }}
         {%- endif %}
 
-/tmp/genie/:
-  file.directory:
-      - user: root
-      - group: root
-
-copy-genie-bin:
-  cmd.run:
-    - name: docker run --rm -v /tmp/genie/:/tmp/genie/ --entrypoint cp {{ pool.network.genie.image }} -v /opt/cni/bin/genie /tmp/genie/
-    - require:
-      - file: /tmp/genie/
-    {%- if grains.get('noservices') %}
-    - onlyif: /bin/false
-    {%- endif %}
-
 /opt/cni/bin/genie:
   file.managed:
-    - source: /tmp/genie/genie
+    - source: {{ pool.network.genie.source }}
+    - source_hash: {{ pool.network.genie.source_hash }}
     - mode: 751
     - user: root
     - group: root
-    - require:
-      - cmd: copy-genie-bin
     {%- if grains.get('noservices') %}
     - onlyif: /bin/false
     {%- endif %}
