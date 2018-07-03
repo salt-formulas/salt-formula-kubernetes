@@ -2,7 +2,7 @@
 {%- from "kubernetes/map.jinja" import master with context -%}
 {%- from "kubernetes/map.jinja" import version %}
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   creationTimestamp: null
@@ -18,6 +18,9 @@ spec:
         runtime: virtlet
       name: virtlet
     spec:
+      selector:
+        matchLabels:
+          runtime: virtlet
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       # hostPID is true to (1) enable VMs to survive virtlet container restart
