@@ -248,8 +248,12 @@ kubelet_service:
 /opt/cni/bin:
   archive.extracted:
     - source: {{ common.cni.plugins.source }}
-    - source_hash: md5={{ common.cni.plugins.hash }}
+    - source_hash: {{ common.cni.plugins.hash }}
+    {%- if grains['saltversioninfo'] < [2017, 7] %}
     - tar_options: xzf
+    {%- else %}
+    - options: xzf
+    {%- endif %}
     - archive_format: tar
     - if_missing: /opt/cni/bin/host-local
 {%- endif %}

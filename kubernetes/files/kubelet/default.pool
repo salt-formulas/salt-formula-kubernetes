@@ -29,10 +29,8 @@ DAEMON_ARGS="\
 {%- else %}
 --node-labels=node-role.kubernetes.io/node=true \
 {%- endif %}
-{%- if pool.network.opencontrail is not defined or ( pool.network.opencontrail is defined and  pool.network.opencontrail.enabled == True ) %}
 --network-plugin=cni \
 --cni-bin-dir={{ pool.apiserver.get('cni_bin_dir', '/opt/cni/bin') }} \
-{%- endif %}
 --file-check-frequency={{ pool.kubelet.frequency }} \
 {%- if common.get('cloudprovider', {}).get('enabled') %}
 --cloud-provider={{ common.cloudprovider.provider }} \
