@@ -1,0 +1,19 @@
+parameters:
+  kubernetes:
+    control:
+      role:
+        patch:
+          enabled: true
+          kind: ClusterRole
+          rules:
+            - apiGroups:
+                - ""
+              resources:
+                - "pods"
+              verbs:
+                - "patch"
+          binding:
+            genie-pod-patch:
+              subject:
+                system:nodes:
+                  kind: Group
