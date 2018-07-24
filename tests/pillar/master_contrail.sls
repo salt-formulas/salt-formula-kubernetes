@@ -38,9 +38,6 @@ kubernetes:
         enabled: true
         namespace: kube-system
         image: mirantis/virtlet:v1.0.3
-        hosts:
-        - cmp01
-        - cmp02
       contrail_network_controller:
         enabled: true
         namespace: kube-system

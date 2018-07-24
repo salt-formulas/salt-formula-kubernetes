@@ -71,9 +71,6 @@ Enable virtlet addon
               enabled: true
               namespace: kube-system
               image: mirantis/virtlet:v1.0.3
-              hosts:
-              - cmp01
-              - cmp02
 
 Enable netchecker addon
 
