@@ -2,6 +2,21 @@
 {%- from "kubernetes/map.jinja" import pool with context -%}
 {%- from "kubernetes/map.jinja" import version %}
 
+{%- if pillar.kubernetes.get('master', {}).get('network', {}).get('opencontrail', {}).get('enabled', false) %}
+{%- if pillar.kubernetes.get('master', {}).get('network', {}).get('opencontrail', {}).get('version', 3.0) >= 4.0 %}
+{%- if pillar.kubernetes.get('master', {}).get('enabled', false) %}
+{# in case of OC4 there should not be CNI used #}
+{%- set add_networking_plugin_conf = False %}
+{%- endif %}
+{%- else %}
+{# in case of OC3 CNI should be everywhere #}
+{%- set add_networking_plugin_conf = True %}
+{%- endif %}
+{%- else %}
+{# In case of calico or any compute node - CNI should be everywhere #}
+{%- set add_networking_plugin_conf = True %}
+{%- endif %}
+
 # test_args has to be kept at the end, so they'll overwrite any prior configuration
 DAEMON_ARGS="\
 --kubeconfig=/etc/kubernetes/kubelet.kubeconfig \
@@ -30,8 +45,10 @@ DAEMON_ARGS="\
 --node-labels=node-role.kubernetes.io/node=true \
 --node-labels=extraRuntime=virtlet \
 {%- endif %}
+{%- if add_networking_plugin_conf %}
 --network-plugin=cni \
 --cni-bin-dir={{ pool.apiserver.get('cni_bin_dir', '/opt/cni/bin') }} \
+{%- endif %}
 --file-check-frequency={{ pool.kubelet.frequency }} \
 {%- if common.get('cloudprovider', {}).get('enabled') %}
 --cloud-provider={{ common.cloudprovider.provider }} \
