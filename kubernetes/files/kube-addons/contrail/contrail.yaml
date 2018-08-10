@@ -157,21 +157,21 @@ spec:
       - name: etc-contrail
         hostPath:
           path: /etc/contrail
-          type: Directory
+          type: DirectoryOrCreate
       - name: contrail-logs
         hostPath:
           path: /var/log/contrail
-          type: Directory
+          type: DirectoryOrCreate
 
       # controller
       - name: var-lib-configdb
         hostPath:
           path: /var/lib/configdb
-          type: Directory
+          type: DirectoryOrCreate
       - name: var-lib-config-zookeeper-data
         hostPath:
           path: /var/lib/config_zookeeper_data
-          type: Directory
+          type: DirectoryOrCreate
       - name: etc-cassandra-cassandra-env-sh
         hostPath:
           path: /etc/cassandra/cassandra-env.sh
@@ -205,11 +205,11 @@ spec:
       - name: var-lib-analyticsdb
         hostPath:
           path: /var/lib/analyticsdb
-          type: Directory
+          type: DirectoryOrCreate
       - name: var-lib-analyticsdb-zookeeper-data
         hostPath:
           path: /var/lib/analyticsdb-zookeeper-data
-          type: Directory
+          type: DirectoryOrCreate
       - name: var-lib-zookeeper-myid    # is used for controller as well
         hostPath:
           path: /var/lib/zookeeper/myid
@@ -229,7 +229,7 @@ spec:
       - name: usr-share-kafka-logs
         hostPath:
           path: /usr/share/kafka/logs
-          type: Directory
+          type: DirectoryOrCreate
       - name: etc-zookeeper-conf-zoo-analytics-cfg
         hostPath:
           path: /etc/zookeeper/conf/zoo_analytics.cfg
