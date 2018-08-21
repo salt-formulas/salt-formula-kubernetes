@@ -33,10 +33,6 @@ parameters:
           port: 80
           agent_image: mirantis/k8s-netchecker-agent:stable
           server_image: mirantis/k8s-netchecker-server:stable
-        calico_policy:
-          enabled: False
-          image: docker-prod-virtual.docker.mirantis.net/mirantis/projectcalico/calico/kube-controllers:v1.0.4
-          namespace: kube-system
         contrail_network_controller:
           enabled: False
           namespace: kube-system

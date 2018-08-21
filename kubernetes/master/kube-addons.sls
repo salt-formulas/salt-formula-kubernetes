@@ -77,10 +77,18 @@ addon-dir-create:
 
 {% endif %}
 
-{%- if common.addons.get('calico_policy', {}).get('enabled', False) and master.network.get('calico', {}).get('enabled', False) %}
-/etc/kubernetes/addons/calico_policy/calico-policy-controller.yml:
+{%- if master.network.get('calico', {}).get('enabled', False) %}
+/etc/kubernetes/addons/calico/calico-kube-controllers.yml:
   file.managed:
-    - source: salt://kubernetes/files/kube-addons/calico-policy/calico-policy-controller.yml
+    - source: salt://kubernetes/files/kube-addons/calico/calico-kube-controllers.yml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
+/etc/kubernetes/addons/calico/calico-rbac.yml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/calico/calico-rbac.yml
     - template: jinja
     - group: root
     - dir_mode: 755

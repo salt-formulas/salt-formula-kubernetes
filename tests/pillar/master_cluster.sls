@@ -30,10 +30,6 @@ kubernetes:
         server_image: image
         agent_image: image
         agent_probeurls: "http://ipinfo.io"
-      calico_policy:
-        enabled: true
-        namespace: kube-system
-        image: image
       virtlet:
         enabled: true
         namespace: kube-system
@@ -69,6 +65,8 @@ kubernetes:
         enabled: true
         calicoctl_image: calico/ctl
         cni_image: calico/cni
+        image: calico/node
+        kube_controllers_image: calico/kube-controllers
         etcd:
           members:
           - host: 127.0.0.1

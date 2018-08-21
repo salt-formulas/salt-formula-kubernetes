@@ -30,10 +30,6 @@ kubernetes:
         server_image: image
         agent_image: image
         agent_probeurls: "http://ipinfo.io"
-      calico_policy:
-        enabled: true
-        namespace: kube-system
-        image: image
       virtlet:
         enabled: true
         namespace: kube-system
