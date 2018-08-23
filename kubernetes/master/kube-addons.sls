@@ -321,6 +321,52 @@ addon-dir-create:
 
 {% endif %}
 
+{%- if common.addons.get('fluentd', {}).get('enabled') %}
+
+/etc/kubernetes/addons/fluentd/fluentd-ns.yaml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/fluentd/fluentd-ns.yaml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
+/etc/kubernetes/addons/fluentd/fluentd-sa.yaml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/fluentd/fluentd-sa.yaml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
+{%- set fluentd_aggregator_resources = ['fluent-conf','deploy', 'svc'] %}
+{%- for resource in fluentd_aggregator_resources %}
+
+/etc/kubernetes/addons/fluentd/fluentd-aggregator-{{ resource }}.yaml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/fluentd/fluentd-aggregator-{{ resource }}.yaml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
+{%- endfor %}
+
+{%- set fluentd_logger_resources = ['fluent-conf', 'ds'] %}
+{%- for resource in fluentd_logger_resources %}
+
+/etc/kubernetes/addons/fluentd/fluentd-logger-{{ resource }}.yaml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/fluentd/fluentd-logger-{{ resource }}.yaml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
+{%- endfor %}
+
+{% endif %}
+
 {%- if common.addons.get('dashboard', {'enabled': False}).enabled %}
 
 {%- set dashboard_resources = ['deployment', 'secret', 'service', 'serviceaccount'] %}

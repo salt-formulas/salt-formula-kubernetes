@@ -1,0 +1,19 @@
+{%- from "kubernetes/map.jinja" import common with context -%}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fluentd-aggregator
+  namespace: stacklight
+  labels:
+    k8s-app: fluentd-aggregator
+    kubernetes.io/cluster-service: "true"
+    kubernetes.io/name: "fluentd-aggregator"
+    addonmanager.kubernetes.io/mode: Reconcile
+spec:
+  selector:
+    k8s-app: fluentd-aggregator
+  ports:
+  - name: fluentd-aggregator
+    port: {{ common.addons.fluentd.aggregator.bind.get('port', '24224') }}
+    protocol: TCP
