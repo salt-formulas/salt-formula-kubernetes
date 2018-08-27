@@ -11,6 +11,7 @@ data:
     @include forward-input.conf
     @include general.conf
     @include kubernetes-filter.conf
+    @include systemd-filter.conf
     @include output.conf
 
   forward-input.conf: |
@@ -49,9 +50,18 @@ data:
     <filter temp.kubernetes.**>
       @type record_transformer
       enable_ruby true
+      remove_keys log
       <record>
         kubernetes_namespace_container_name ${record["kubernetes"]["namespace_name"]}.${record["kubernetes"]["container_name"]}
+        Payload ${record['log']}
       </record>
+    </filter>
+    <filter temp.kubernetes.kube-system.**>
+      @type parser
+      format kubernetes
+      reserve_data true
+      key_name log
+      suppress_parse_error_log true
     </filter>
     <filter temp.kubernetes.container.**>
       @type record_transformer
@@ -62,11 +72,28 @@ data:
         programname ${ record['kubernetes']['container_name'] }
       </record>
     </filter>
-    <filter temp.kubernetes.kube-system.**>
-      @type parser
+
+  systemd-filter.conf: |
+    <match systemd.source>
+      @type rewrite_tag_filter
+      <rule>
+        key ident
+        pattern ^(.*)$
+        tag __TAG__.$1
+      </rule>
+    </match>
+    <filter systemd.source.kubelet>
+      type parser
       format kubernetes
       reserve_data true
-      key_name log
+      key_name MESSAGE
+      suppress_parse_error_log true
+    </filter>
+    <filter systemd.source.docker>
+      type parser
+      format /^time="(?<time>[^)]*)" level=(?<severity>[^ ]*) msg="(?<message>[^"]*)"( err="(?<error>[^"]*)")?( statusCode=($<status_code>\d+))?/
+      reserve_data true
+      key_name MESSAGE
       suppress_parse_error_log true
     </filter>
 
@@ -79,15 +106,16 @@ data:
         tag kubernetes.container.$1
       </rule>
     </match>
-    <match kubernetes.**>
+
+    <match **>
       @type elasticsearch
+      log_level debug
       host "#{ENV['FLUENTD_ELASTICSEARCH_HOST']}"
       port "#{ENV['FLUENTD_ELASTICSEARCH_PORT']}"
       scheme "#{ENV['FLUENTD_ELASTICSEARCH_SCHEME'] || 'http'}"
       ssl_verify "#{ENV['FLUENTD_ELASTICSEARCH_SSL_VERIFY'] || 'true'}"
       reload_connections "#{ENV['FLUENTD_ELASTICSEARCH_RELOAD_CONNECTIONS'] || 'true'}"
       type_name message
-      tag_key Logger
       include_tag_key true
       time_key Timestamp
       time_key_exclude_timestamp true

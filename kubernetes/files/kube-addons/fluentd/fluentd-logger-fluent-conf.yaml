@@ -9,8 +9,8 @@ metadata:
 data:
   fluent.conf: |
     @include general.conf
-    @include apiserver-audit-input.conf
     @include kubernetes-input.conf
+    @include systemd-input.conf
     @include forward-output.conf
 
   general.conf: |
@@ -23,19 +23,6 @@ data:
       bind 0.0.0.0
     </source>
 
-  apiserver-audit-input.conf: |
-    <source>
-      @type tail
-      format multiline
-      multiline_flush_interval 5s
-      format_firstline /^\S+\s+AUDIT:/
-      format1 /^(?<time>\S+) AUDIT:(?: (?:id="(?<id>(?:[^"\\]|\\.)*)"|ip="(?<ip>(?:[^"\\]|\\.)*)"|method="(?<method>(?:[^"\\]|\\.)*)"|user="(?<user>(?:[^"\\]|\\.)*)"|groups="(?<groups>(?:[^"\\]|\\.)*)"|as="(?<as>(?:[^"\\]|\\.)*)"|asgroups="(?<asgroups>(?:[^"\\]|\\.)*)"|namespace="(?<namespace>(?:[^"\\]|\\.)*)"|uri="(?<uri>(?:[^"\\]|\\.)*)"|response="(?<response>(?:[^"\\]|\\.)*)"|\w+="(?:[^"\\]|\\.)*"))*/
-      time_format %FT%T.%L%Z
-      path /var/log/kubernetes/kube-apiserver-audit.log
-      pos_file /var/log/kube-apiserver-audit.log.pos
-      tag temp.kubernetes.apiserver-audit.*
-    </source>
-
   kubernetes-input.conf: |
     <source>
       @type tail
@@ -45,6 +32,21 @@ data:
       tag temp.kubernetes.container.*
       format json
       read_from_head true
+      path_key log_path
+    </source>
+
+  systemd-input.conf: |
+    <source>
+      @type systemd
+      path /run/log/journal
+      pos_file /var/log/fluentd-journald-systemd.pos
+      tag systemd.source
+      <entry>
+        field_map {"MESSAGE": "Payload", "_CMDLINE": "process", "_COMM": "programname", "_PID": "Pid", "_SYSTEMD_UNIT": "service", "priority": "Severity", "syslog_identifier": "ident" }
+        field_map_strict true
+        fields_strip_underscores true
+        fields_lowercase true
+      </entry>
     </source>
 
   forward-output.conf: |

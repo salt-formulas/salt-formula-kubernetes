@@ -50,6 +50,8 @@ spec:
         - name: fluentd-logger-config
           mountPath: /fluentd/etc
           readOnly: false
+        - name: runlog
+          mountPath: /run/log
       terminationGracePeriodSeconds: 30
       volumes:
       - name: varlog
@@ -61,3 +63,6 @@ spec:
       - name: fluentd-logger-config
         configMap:
           name: fluentd-logger-cfg
+      - name: runlog
+        hostPath:
+          path: /run/log
