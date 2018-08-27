@@ -367,6 +367,21 @@ addon-dir-create:
 
 {% endif %}
 
+{%- if common.addons.get('telegraf', {}).get('enabled') %}
+{%- set telegraf_resources = ['conf', 'ns', 'sa', 'ds'] %}
+
+{%- for resource in telegraf_resources %}
+/etc/kubernetes/addons/telegraf/telegraf-{{ resource }}.yaml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/telegraf/telegraf-{{ resource }}.yaml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+{%- endfor %}
+
+{% endif %}
+
 {%- if common.addons.get('dashboard', {'enabled': False}).enabled %}
 
 {%- set dashboard_resources = ['deployment', 'secret', 'service', 'serviceaccount'] %}

@@ -1,0 +1,82 @@
+{%- from "kubernetes/map.jinja" import common with context -%}
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: telegraf-cfg
+  namespace: {{ common.addons.telegraf.get('namespace', 'stacklight') }}
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
+data:
+  telegraf.conf: |+
+    [global_tags]
+
+      {%- if common.addons.telegraf.global_tags is defined %}
+        {%- for tag_name, tag_value in common.addons.telegraf.global_tags.iteritems() %}
+          {{ tag_name }} = "{{ tag_value }}"
+      {%- endfor %}
+      {%- endif %}
+
+    [agent]
+      {%- if common.addons.telegraf.agent.interval is defined %}
+      interval = "{{ common.addons.telegraf.agent.interval }}s"
+      {%- endif %}
+
+      {%- if common.addons.telegraf.agent.round_interval is defined %}
+      round_interval = {{ common.addons.telegraf.agent.round_interval | lower }}
+      {%- endif %}
+
+      {%- if common.addons.telegraf.agent.metric_batch_size is defined %}
+      metric_batch_size = {{ common.addons.telegraf.agent.metric_batch_size }}
+      {%- endif %}
+
+      {%- if common.addons.telegraf.agent.metric_buffer_limit is defined %}
+      metric_buffer_limit = {{ common.addons.telegraf.agent.metric_buffer_limit }}
+      {%- endif %}
+
+      {%- if common.addons.telegraf.agent.collection_jitter is defined %}
+      collection_jitter = "{{ common.addons.telegraf.agent.collection_jitter }}s"
+      {%- endif %}
+
+      {%- if common.addons.telegraf.agent.flush_interval is defined %}
+      flush_interval = "{{ common.addons.telegraf.agent.flush_interval }}s"
+      {%- endif %}
+
+      {%- if common.addons.telegraf.agent.flush_jitter is defined %}
+      flush_jitter = "{{ common.addons.telegraf.agent.flush_jitter }}s"
+      {%- endif %}
+
+      {%- if common.addons.telegraf.agent.precision is defined %}
+      precision = "{{ common.addons.telegraf.agent.precision }}"
+      {%- endif %}
+
+      {%- if common.addons.telegraf.agent.logfile is defined %}
+      logfile = "{{ common.addons.telegraf.agent.logfile }}"
+      {%- endif %}
+
+      {%- if common.addons.telegraf.agent.debug is defined %}
+      debug = {{ common.addons.telegraf.agent.debug | lower }}
+      {%- endif %}
+
+      {%- if common.addons.telegraf.agent.quiet is defined %}
+      quiet = {{ common.addons.telegraf.agent.quiet | lower }}
+      {%- endif %}
+
+      {%- if common.addons.telegraf.agent.hostname is defined %}
+      hostname = "{{ common.addons.telegraf.agent.hostname }}"
+      {%- endif %}
+
+      {%- if common.addons.telegraf.agent.omit_hostname is defined %}
+      omit_hostname = {{ common.addons.telegraf.agent.omit_hostname | lower }}
+      {%- endif %}
+
+    [[inputs.disk]]
+      ignore_fs = ["tmpfs", "devtmpfs"]
+    [[inputs.diskio]]
+    [[inputs.kernel]]
+    [[inputs.mem]]
+    [[inputs.processes]]
+    [[inputs.swap]]
+    [[inputs.system]]
+    [[outputs.prometheus_client]]
+      listen = "0.0.0.0:9126"

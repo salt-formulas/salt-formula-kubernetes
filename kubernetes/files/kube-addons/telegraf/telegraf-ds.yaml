@@ -1,0 +1,76 @@
+{%- from "kubernetes/map.jinja" import common with context -%}
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: telegraf
+  namespace: {{ common.addons.telegraf.get('namespace', 'stacklight') }}
+  labels:
+    k8s-app: telegraf
+    version: v1
+    kubernetes.io/cluster-service: "true"
+    beta.kubernetes.io/telegraf-ds-ready: "true"
+spec:
+  template:
+    metadata:
+      labels:
+        k8s-app: telegraf
+        version: v1
+        kubernetes.io/cluster-service: "true"
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+        seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
+    spec:
+      priorityClassName: system-node-critical
+      serviceAccountName: telegraf
+      tolerations:
+      - key: node-role.kubernetes.io/master
+      containers:
+      - name: telegraf
+        image: {{ common.addons.telegraf.image }}
+        env:
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: "HOST_PROC"
+          value: "/rootfs/proc"
+        - name: "HOST_SYS"
+          value: "/rootfs/sys"
+        resources:
+          limits:
+            memory: {{ common.addons.telegraf.resources.limits.memory }}
+          requests:
+            memory: {{ common.addons.telegraf.resources.requests.memory }}
+        volumeMounts:
+        - name: sys
+          mountPath: /rootfs/sys
+          readOnly: true
+        - name: docker-socket
+          mountPath: /var/run/docker.sock
+          readOnly: true
+        - name: proc
+          mountPath: /rootfs/proc
+          readOnly: true
+        - name: utmp
+          mountPath: /var/run/utmp
+          readOnly: true
+        - name: telegraf-cfg
+          mountPath: /etc/telegraf
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: docker-socket
+        hostPath:
+          path: /var/run/docker.sock
+      - name: proc
+        hostPath:
+          path: /proc
+      - name: utmp
+        hostPath:
+          path: /var/run/utmp
+      - name: telegraf-cfg
+        configMap:
+          name: telegraf-cfg
