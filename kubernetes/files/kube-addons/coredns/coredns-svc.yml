@@ -8,11 +8,12 @@ metadata:
   labels:
     k8s-app: coredns
     kubernetes.io/cluster-service: "true"
-    kubernetes.io/name: "coredns"
+    kubernetes.io/name: "CoreDNS"
     addonmanager.kubernetes.io/mode: Reconcile
 spec:
   selector:
     k8s-app: coredns
+  clusterIP: {{ common.addons.coredns.server }}
   ports:
   - name: dns
     port: 53

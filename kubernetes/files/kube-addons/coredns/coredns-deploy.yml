@@ -11,32 +11,40 @@ metadata:
     kubernetes.io/name: "CoreDNS"
     addonmanager.kubernetes.io/mode: Reconcile
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       k8s-app: coredns
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
         k8s-app: coredns
-      annotations:
-        scheduler.alpha.kubernetes.io/critical-pod: ''
-        scheduler.alpha.kubernetes.io/tolerations: '[{"key":"CriticalAddonsOnly", "operator":"Exists"}]'
-{%- if common.addons.coredns.cni is defined %}
-        cni: {{ common.addons.coredns.cni }}
-{%- endif %}
     spec:
+      serviceAccountName: coredns
       tolerations:
         - key: node-role.kubernetes.io/master
           effect: NoSchedule
+        - key: "CriticalAddonsOnly"
+          operator: "Exists"
       containers:
       - name: coredns
         image: {{ common.addons.coredns.image }}
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: 170Mi
+          requests:
+            cpu: 100m
+            memory: 70Mi
         args: [ "-conf", "/etc/coredns/Corefile" ]
         volumeMounts:
         - name: config-volume
           mountPath: /etc/coredns
+          readOnly: true
         ports:
         - containerPort: 53
           name: dns
@@ -44,6 +52,17 @@ spec:
         - containerPort: 53
           name: dns-tcp
           protocol: TCP
+        - containerPort: 9153
+          name: metrics
+          protocol: TCP
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+            drop:
+            - all
+          readOnlyRootFilesystem: true
         livenessProbe:
           httpGet:
             path: /health
@@ -53,7 +72,7 @@ spec:
           timeoutSeconds: 5
           successThreshold: 1
           failureThreshold: 5
-      dnsPolicy: ClusterFirst
+      dnsPolicy: Default
       volumes:
         - name: config-volume
           configMap:

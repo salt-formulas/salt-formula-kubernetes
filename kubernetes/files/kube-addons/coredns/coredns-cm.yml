@@ -30,4 +30,11 @@ data:
         health
         proxy . /etc/resolv.conf
         cache 30
+        reload
+        loadbalance
+        kubernetes {{ common.addons.coredns.domain|replace('_', '-') }}. in-addr.arpa ip6.arpa {
+          pods insecure
+          upstream
+          fallthrough in-addr.arpa ip6.arpa
+        }
     }

@@ -246,7 +246,11 @@ addon-dir-create:
 
 {% endif %}
 
-{%- if common.addons.coredns.enabled or master.federation.enabled %}
+{% endif %}
+
+{%- if common.addons.get('coredns', {}).get('enabled') %}
+
+{%- if master.get('federation', {}).get('enabled') or (common.addons.get('externaldns', {}).get('enabled') and common.addons.get('externaldns', {}).get('provider') == "coredns") %}
 /etc/kubernetes/addons/coredns/coredns-etcd-operator-deployment.yaml:
   file.managed:
     - source: salt://kubernetes/files/kube-addons/coredns/coredns-etcd-operator-deployment.yaml
@@ -262,6 +266,7 @@ addon-dir-create:
     - group: root
     - dir_mode: 755
     - makedirs: True
+{% endif %}
 
 /etc/kubernetes/addons/coredns/coredns-cm.yml:
   file.managed:
@@ -286,8 +291,14 @@ addon-dir-create:
     - group: root
     - dir_mode: 755
     - makedirs: True
-{% endif %}
 
+/etc/kubernetes/addons/coredns/coredns-rbac.yml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/coredns/coredns-rbac.yml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
 {% endif %}
 
 {%- if common.addons.get('externaldns', {}).get('enabled') %}

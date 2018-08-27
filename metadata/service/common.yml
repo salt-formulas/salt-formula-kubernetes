@@ -41,6 +41,8 @@ parameters:
           enabled: False
           namespace: kube-system
           image: coredns/coredns:latest
+          domain: cluster.local
+          server: 10.254.0.10
           etcd:
             operator_image: quay.io/coreos/etcd-operator:v0.5.2
             version: 3.1.8
