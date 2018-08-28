@@ -4,7 +4,7 @@ apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
   name: fluentd-logger
-  namespace: stacklight
+  namespace: {{ common.addons.fluentd.get('namespace', 'stacklight') }}
   labels:
     k8s-app: fluentd-logger
     version: v1
@@ -30,17 +30,17 @@ spec:
         - key: node-role.kubernetes.io/master
       containers:
       - name: fluentd-logger
-        image: fluent/fluentd-kubernetes-daemonset:v1.2-debian-stackdriver
+        image: {{ common.addons.fluentd.logger.get('image', 'fluent/fluentd-kubernetes-daemonset:v1.2-debian-stackdriver') }}
         env:
           - name: FLUENTD_AGGREGATOR_HOST
             value: "fluentd-aggregator"
           - name: FLUENTD_AGGREGATOR_PORT
-            value: "{{ common.addons.fluentd.aggregator.bind.get('port', '24224') }}"
+            value: "{{ common.addons.fluentd.aggregator.config.forward_input.bind.get('port', '24224') }}"
         resources:
           limits:
-            memory: 500Mi
+            memory: {{ common.addons.fluentd.logger.resources.limits.get('memory', '500Mi') }}
           requests:
-            memory: 500Mi
+            memory: {{ common.addons.fluentd.logger.resources.requests.get('memory', '500Mi') }}
         volumeMounts:
         - name: varlog
           mountPath: /var/log

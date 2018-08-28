@@ -1,9 +1,10 @@
+{%- from "kubernetes/map.jinja" import common with context -%}
 ---
 kind: ConfigMap
 apiVersion: v1
 metadata:
   name: fluentd-aggregator-cfg
-  namespace: stacklight
+  namespace: {{ common.addons.fluentd.get('namespace', 'stacklight') }}
   labels:
     addonmanager.kubernetes.io/mode: Reconcile
 data:
@@ -37,7 +38,7 @@ data:
         Type log
         environment_label "#{ENV['ENVIRONMENT_LABEL']}"
         Hostname ${ hostname }
-        Timestamp ${ time.strftime('%Y-%m-%dT%H:%M:%S.%N%z') }
+        Timestamp ${ time.strftime("{{ common.addons.fluentd.aggregator.config.general.get('time_format', '%Y-%m-%dT%H:%M:%S.%N%z') }}") }
       </record>
     </filter>
 
@@ -50,30 +51,36 @@ data:
     <filter temp.kubernetes.**>
       @type record_transformer
       enable_ruby true
-      remove_keys log
       <record>
         kubernetes_namespace_container_name ${record["kubernetes"]["namespace_name"]}.${record["kubernetes"]["container_name"]}
-        Payload ${record['log']}
       </record>
     </filter>
-    <filter temp.kubernetes.kube-system.**>
-      @type parser
-      format kubernetes
-      reserve_data true
-      key_name log
-      suppress_parse_error_log true
-    </filter>
+    <match temp.kubernetes.container>
+      @type rewrite_tag_filter
+      <rule>
+        key
+        pattern ^(.*)$
+        tag __TAG__.$1
+      </rule>
+    </match>
     <filter temp.kubernetes.container.**>
       @type record_transformer
       enable_ruby
       <record>
-        severity_label INFO
-        Severity 6
+        severity_label ${ {"ERROR"=>"stderr","INFO"=>"stdout"}.key(record["stream"]) }
+        Severity ${ {3=>"stderr",6=>"stdout"}.key(record["stream"]) }
         programname ${ record['kubernetes']['container_name'] }
       </record>
     </filter>
 
   systemd-filter.conf: |
+    <filter systemd.source>
+      @type record_transformer
+      enable_ruby
+      <record>
+        severity_label ${ {"TRACE"=>8,"DEBUG"=>7,"INFO"=>6,"NOTICE"=>5,"WARNING"=>4,"ERROR"=>3,"CRITICAL"=>2,"ALERT"=>1,"EMERGENCY"=>0}.key(record["Severity"].to_i) }
+      </record>
+    </filter>
     <match systemd.source>
       @type rewrite_tag_filter
       <rule>
@@ -83,18 +90,20 @@ data:
       </rule>
     </match>
     <filter systemd.source.kubelet>
-      type parser
+      @type parser
       format kubernetes
       reserve_data true
-      key_name MESSAGE
-      suppress_parse_error_log true
+      key_name Payload
     </filter>
-    <filter systemd.source.docker>
-      type parser
-      format /^time="(?<time>[^)]*)" level=(?<severity>[^ ]*) msg="(?<message>[^"]*)"( err="(?<error>[^"]*)")?( statusCode=($<status_code>\d+))?/
+    <filter systemd.source.kube-apiserver>
+      @type parser
+      format kubernetes
       reserve_data true
-      key_name MESSAGE
-      suppress_parse_error_log true
+      key_name Payload
+    </filter>
+    <filter systemd.source.**>
+      @type record_transformer
+      remove_keys message, severity
     </filter>
 
   output.conf: |
@@ -109,24 +118,25 @@ data:
 
     <match **>
       @type elasticsearch
-      log_level debug
+      @log_level {{ common.addons.fluentd.aggregator.config.output.get('log_level', 'info') }}
       host "#{ENV['FLUENTD_ELASTICSEARCH_HOST']}"
       port "#{ENV['FLUENTD_ELASTICSEARCH_PORT']}"
       scheme "#{ENV['FLUENTD_ELASTICSEARCH_SCHEME'] || 'http'}"
       ssl_verify "#{ENV['FLUENTD_ELASTICSEARCH_SSL_VERIFY'] || 'true'}"
       reload_connections "#{ENV['FLUENTD_ELASTICSEARCH_RELOAD_CONNECTIONS'] || 'true'}"
       type_name message
+      tag_key Logger
       include_tag_key true
       time_key Timestamp
       time_key_exclude_timestamp true
-      logstash_format true
-      logstash_prefix k8s
-      logstash_dateformat %Y.%m.%d
-      request_timeout 10s
-      buffer_chunk_limit 2M
-      buffer_queue_limit 32
-      flush_interval 10s
-      max_retry_wait 30
+      logstash_format {{ common.addons.fluentd.aggregator.config.output.get('logstash_format', 'true') | lower }}
+      logstash_prefix {{ common.addons.fluentd.aggregator.config.output.get('logstash_prefix', 'log') }}
+      logstash_dateformat {{ common.addons.fluentd.aggregator.config.output.get('logstash_dateformat', '%Y.%m.%d') }}
+      request_timeout {{ common.addons.fluentd.aggregator.config.output.get('request_timeout', '10s') }}
+      buffer_chunk_limit {{ common.addons.fluentd.aggregator.config.output.get('buffer_chunk_limit', '2m') }}
+      buffer_queue_limit {{ common.addons.fluentd.aggregator.config.output.get('buffer_queue_limit', '32') }}
+      flush_interval {{ common.addons.fluentd.aggregator.config.output.get('flush_interval', '10s') }}
+      max_retry_wait {{ common.addons.fluentd.aggregator.config.output.get('max_retry_wait', '30') }}
       disable_retry_limit
-      num_threads 8
+      num_threads {{ common.addons.fluentd.aggregator.config.output.get('num_threads', '8') }}
     </match>

@@ -4,7 +4,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: fluentd-aggregator
-  namespace: stacklight
+  namespace: {{ common.addons.fluentd.get('namespace', 'stacklight') }}
   labels:
     k8s-app: fluentd-aggregator
     version: v1
@@ -30,20 +30,18 @@ spec:
           effect: NoSchedule
       containers:
       - name: fluentd-aggregator
-        image: fluent/fluentd-kubernetes-daemonset:v1.2-debian-elasticsearch
+        image: {{ common.addons.fluentd.aggregator.get('image', 'fluent/fluentd-kubernetes-daemonset:v1.2-debian-elasticsearch') }}
         env:
           - name: FLUENTD_ELASTICSEARCH_HOST
-            value: "{{ common.addons.fluentd.aggregator.es.get('host', '127.0.0.1') }}"
+            value: "{{ common.addons.fluentd.aggregator.config.output.es.get('host', '127.0.0.1') }}"
           - name: FLUENTD_ELASTICSEARCH_PORT
-            value: "{{ common.addons.fluentd.aggregator.es.get('port', '9200') }}"
+            value: "{{ common.addons.fluentd.aggregator.config.output.es.get('port', '9200') }}"
           - name: FLUENTD_ELASTICSEARCH_SCHEME
-            value: "{{ common.addons.fluentd.aggregator.es.get('scheme', 'http') }}"
+            value: "{{ common.addons.fluentd.aggregator.config.output.es.get('scheme', 'http') }}"
           - name: FLUENTD_AGGREGATOR_BIND_PORT
-            value: "{{ common.addons.fluentd.aggregator.bind.get('port', '24224') }}"
+            value: "{{ common.addons.fluentd.aggregator.config.forward_input.bind.get('port', '24224') }}"
           - name: ENVIRONMENT_LABEL
             value: "{{ grains.domain }}"
-         # - name: FLUENTD_OPT
-         #   value: "--use-v1-config"
          # TODO: a hack to pass the broken entrypoint in upstream docker image for k8s fluent when configmap is used
           - name: FLUENT_ELASTICSEARCH_USER
             value: "null"
@@ -51,11 +49,11 @@ spec:
             value: "null"
         resources:
           limits:
-            memory: 500Mi
+            memory: {{ common.addons.fluentd.aggregator.resources.limits.get('memory', '500Mi') }}
           requests:
-            memory: 500Mi
+            memory: {{ common.addons.fluentd.aggregator.resources.requests.get('memory', '500Mi') }}
         ports:
-        - containerPort: {{ common.addons.fluentd.aggregator.bind.get('port', '24224') }}
+        - containerPort: {{ common.addons.fluentd.aggregator.config.forward_input.bind.get('port', '24224') }}
           name: main-input
           protocol: TCP
         - containerPort: 9880

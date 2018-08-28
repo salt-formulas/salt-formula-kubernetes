@@ -4,7 +4,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: fluentd-aggregator
-  namespace: stacklight
+  namespace: {{ common.addons.fluentd.get('namespace', 'stacklight') }}
   labels:
     k8s-app: fluentd-aggregator
     kubernetes.io/cluster-service: "true"
@@ -15,5 +15,5 @@ spec:
     k8s-app: fluentd-aggregator
   ports:
   - name: fluentd-aggregator
-    port: {{ common.addons.fluentd.aggregator.bind.get('port', '24224') }}
+    port: {{ common.addons.fluentd.aggregator.config.forward_input.bind.get('port', '24224') }}
     protocol: TCP
