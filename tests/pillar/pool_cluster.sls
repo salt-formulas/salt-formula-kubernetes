@@ -49,6 +49,8 @@ kubernetes:
         enabled: true
         calicoctl_image: calico/ctl
         cni_image: calico/cni
+        image: calico/node
+        kube_controllers_image: calico/kube-controllers
         etcd:
           members:
           - host: 127.0.0.1

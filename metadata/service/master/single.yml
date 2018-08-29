@@ -51,10 +51,6 @@ parameters:
         helm:
           enabled: False
           tiller_image: gcr.io/kubernetes-helm/tiller:v2.4.2
-        calico_policy:
-          enabled: False
-          image: docker-prod-virtual.docker.mirantis.net/mirantis/projectcalico/calico/kube-controllers:v1.0.4
-          namespace: kube-system
         contrail_network_controller:
           enabled: False
           namespace: kube-system

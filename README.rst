@@ -22,7 +22,7 @@ keep in mind `kubernetes_control_address` needs to be accessible from your compu
 Sample Pillars
 ==============
 
-**REQUIRED:** Define image to use for hyperkube, CNIs and calicoctl image
+**REQUIRED:** Define images to use for hyperkube and Calico
 
 .. code-block:: yaml
 
@@ -36,6 +36,9 @@ Sample Pillars
             calico:
               calicoctl_image: calico/ctl
               cni_image: calico/cni
+              image: calico/node
+              kube_controllers_image: calico/kube-controllers
+
 
 Enable helm-tiller addon
 
@@ -48,16 +51,17 @@ Enable helm-tiller addon
             helm:
               enabled: true
 
-Enable calico-policy addon
+Enable calico-policy
 
 .. code-block:: yaml
 
     parameters:
       kubernetes:
-        common:
-          addons:
-            calico_policy:
-              enabled: true
+        pool:
+          network:
+            calico:
+              policy:
+                enabled: true
 
 Enable virtlet addon
 
@@ -604,7 +608,7 @@ Running with secured etcd:
               ssl:
                 enabled: true
 
-Running with calico-policy controller:
+Running with calico-policy:
 
 .. code-block:: yaml
 
@@ -613,16 +617,14 @@ Running with calico-policy controller:
         network:
           calico:
             enabled: true
-          addons:
-            calico_policy:
+            policy:
               enabled: true
 
       master:
         network:
           calico:
             enabled: true
-          addons:
-            calico_policy:
+            policy:
               enabled: true
 
 

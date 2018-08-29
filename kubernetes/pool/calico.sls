@@ -29,7 +29,7 @@ copy-calico-ctl:
 
 copy-calico-node:
   cmd.run:
-    - name: docker run --rm -v /tmp/calico/:/tmp/calico/ --entrypoint cp {{ pool.network.calico.get('image', 'calico/node') }} -v /bin/birdcl /tmp/calico/
+    - name: docker run --rm -v /tmp/calico/:/tmp/calico/ --entrypoint cp {{ pool.network.calico.image }} -v /bin/birdcl /tmp/calico/
     - require:
       - file: /tmp/calico/
     {%- if grains.get('noservices') %}
