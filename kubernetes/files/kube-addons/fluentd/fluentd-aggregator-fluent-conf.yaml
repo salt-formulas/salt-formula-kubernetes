@@ -48,13 +48,6 @@ data:
       merge_json_log true
       preserve_json_log true
     </filter>
-    <filter temp.kubernetes.**>
-      @type record_transformer
-      enable_ruby true
-      <record>
-        kubernetes_namespace_container_name ${record["kubernetes"]["namespace_name"]}.${record["kubernetes"]["container_name"]}
-      </record>
-    </filter>
     <match temp.kubernetes.container>
       @type rewrite_tag_filter
       <rule>
@@ -63,6 +56,25 @@ data:
         tag __TAG__.$1
       </rule>
     </match>
+    <match temp.kubernetes.service>
+      @type rewrite_tag_filter
+      <rule>
+        key service
+        pattern (.*)
+        tag __TAG__.$1
+      </rule>
+    </match>
+    <filter temp.kubernetes.service.**>
+      @type record_transformer
+      enable_ruby
+      remove_keys severity
+      <record>
+        severity_label ${ {"ERROR"=>"E","INFO"=>"I","WARNING"=>"W","NOTICE"=>"N"}.key(record["severity"]) }
+        Severity ${ {3=>"E",4=>"W",5=>"N",6=>"I",}.key(record["severity"]) }
+        programname ${ record['service'] }
+        service ${record['service']}.service
+      </record>
+    </filter>
     <filter temp.kubernetes.container.**>
       @type record_transformer
       enable_ruby
@@ -70,6 +82,7 @@ data:
         severity_label ${ {"ERROR"=>"stderr","INFO"=>"stdout"}.key(record["stream"]) }
         Severity ${ {3=>"stderr",6=>"stdout"}.key(record["stream"]) }
         programname ${ record['kubernetes']['container_name'] }
+        kubernetes_namespace_container_name ${record["kubernetes"]["namespace_name"]}.${record["kubernetes"]["container_name"]}
       </record>
     </filter>
 
@@ -89,18 +102,6 @@ data:
         tag __TAG__.$1
       </rule>
     </match>
-    <filter systemd.source.kubelet>
-      @type parser
-      format kubernetes
-      reserve_data true
-      key_name Payload
-    </filter>
-    <filter systemd.source.kube-apiserver>
-      @type parser
-      format kubernetes
-      reserve_data true
-      key_name Payload
-    </filter>
     <filter systemd.source.**>
       @type record_transformer
       remove_keys message, severity
@@ -113,6 +114,14 @@ data:
         key log_path
         pattern ^.*\/(.*)\.log$
         tag kubernetes.container.$1
+      </rule>
+    </match>
+    <match temp.kubernetes.service.**>
+      @type rewrite_tag_filter
+      <rule>
+        key programname
+        pattern (.*)
+        tag kubernetes.service.$1
       </rule>
     </match>
 

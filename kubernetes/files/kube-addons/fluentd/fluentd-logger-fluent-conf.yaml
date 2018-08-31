@@ -35,11 +35,26 @@ data:
       read_from_head true
       path_key log_path
     </source>
+    <source>
+      @type tail
+      path /var/log/kubernetes.log
+      pos_file /var/log/fluentd-kubernetes.log.pos
+      time_format {{ common.addons.fluentd.logger.config.kubernetes_input.get('time_format') }}
+      tag temp.kubernetes.service
+      format json
+      <parse>
+        @type regexp
+        expression /^(?<service>[^\[]*)\[.*\]:\s(?<severity>\w)(?<time>\d{4} [^\s]*)\s+(?<pid>\d+)\s+(?<source>[^ \]]+)\] (?<log>.*)/
+        time_key time
+      </parse>
+      read_from_head true
+      path_key log_path
+    </source>
 
   systemd-input.conf: |
     <source>
       @type systemd
-      matches [{"_SYSTEMD_UNIT": "kubelet.service"}, {"_SYSTEMD_UNIT": "docker.service"}, {"_SYSTEMD_UNIT": "kube-apiserver.service"} ]
+      matches [{"_SYSTEMD_UNIT": "docker.service"}]
       path /run/log/journal
       pos_file /var/log/fluentd-journald-systemd.pos
       tag systemd.source
