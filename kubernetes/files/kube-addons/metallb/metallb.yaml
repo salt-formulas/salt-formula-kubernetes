@@ -60,23 +60,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   namespace: metallb-system
-  name: leader-election
-  labels:
-    app: metallb
-    addonmanager.kubernetes.io/mode: Reconcile
-rules:
-- apiGroups: [""]
-  resources: ["endpoints"]
-  resourceNames: ["metallb-speaker"]
-  verbs: ["get", "update"]
-- apiGroups: [""]
-  resources: ["endpoints"]
-  verbs: ["create"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  namespace: metallb-system
   name: config-watcher
   labels:
     app: metallb
@@ -141,22 +124,6 @@ roleRef:
   kind: Role
   name: config-watcher
 ---
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  namespace: metallb-system
-  name: leader-election
-  labels:
-    app: metallb
-    addonmanager.kubernetes.io/mode: Reconcile
-subjects:
-- kind: ServiceAccount
-  name: speaker
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: leader-election
----
 apiVersion: apps/v1beta2
 kind: DaemonSet
 metadata:
@@ -185,7 +152,7 @@ spec:
       hostNetwork: true
       containers:
       - name: speaker
-        image: {{ common.addons.get('metallb', {}).get('speaker_image', 'metallb/speaker:v0.6.2') }}
+        image: {{ common.addons.get('metallb', {}).get('speaker_image', 'metallb/speaker:v0.7.3') }}
         imagePullPolicy: IfNotPresent
         args:
         - --port=7472
@@ -243,7 +210,7 @@ spec:
         runAsUser: 65534 # nobody
       containers:
       - name: controller
-        image: {{ common.addons.get('metallb', {}).get('controller_image', 'metallb/controller:v0.6.2') }}
+        image: {{ common.addons.get('metallb', {}).get('controller_image', 'metallb/controller:v0.7.3') }}
         imagePullPolicy: IfNotPresent
         args:
         - --port=7472
