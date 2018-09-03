@@ -240,8 +240,16 @@ data:
   config: |
     address-pools:
     - name: metallb-ip-space
-      protocol: layer2
+      protocol: {{ common.addons.get('metallb', {}).get('protocol', 'layer2') }}
       addresses:
       {%- for address in common.addons.get('metallb', {}).get('addresses', []) %}
       - {{ address }}
       {%- endfor %}
+      {%- if common.addons.metallb.peers is defined and common.addons.get('metallb', {}).get('protocol', 'layer2') == 'bgp' %}
+    peers:
+    {%- for peer in common.addons.get('metallb', {}).get('peers', []) %}
+    - peer-address: {{ peer.get('peer-address', '127.0.0.1') }}
+      peer-asn: {{ peer.get('peer-asn', '64512') }}
+      my-asn: {{ peer.get('my-asn', '64512') }}
+    {%- endfor %}
+    {%- endif %}
