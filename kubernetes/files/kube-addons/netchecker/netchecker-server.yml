@@ -23,9 +23,15 @@ spec:
 {%- endif %}
     spec:
       serviceAccountName: netchecker
+      {%- if salt['pillar.get']('kubernetes').get('master', {}).get('network', {}).get('opencontrail', {}).get('enabled', false) %}
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/node
+      {%- else %}
       tolerations:
         - key: node-role.kubernetes.io/master
           effect: NoSchedule
+      {%- endif %}
       containers:
         - name: netchecker-server
           image: {{ common.addons.netchecker.server_image }}

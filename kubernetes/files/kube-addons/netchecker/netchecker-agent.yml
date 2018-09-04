@@ -18,9 +18,15 @@ spec:
         cni: {{ common.addons.netchecker.cni }}
 {%- endif %}
     spec:
+      {%- if salt['pillar.get']('kubernetes').get('master', {}).get('network', {}).get('opencontrail', {}).get('enabled', false) %}
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/node
+      {%- else %}
       tolerations:
         - key: node-role.kubernetes.io/master
           effect: NoSchedule
+      {%- endif %}
       containers:
         - name: netchecker-agent
           image: {{ common.addons.netchecker.agent_image }}

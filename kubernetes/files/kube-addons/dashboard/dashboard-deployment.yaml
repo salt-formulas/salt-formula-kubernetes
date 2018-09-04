@@ -51,6 +51,12 @@ spec:
         emptyDir: {}
       serviceAccountName: kubernetes-dashboard
       # Comment the following tolerations if Dashboard must not be deployed on master
+      {%- if salt['pillar.get']('kubernetes').get('master', {}).get('network', {}).get('opencontrail', {}).get('enabled', false) %}
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/node
+      {%- else %}
       tolerations:
       - key: node-role.kubernetes.io/master
         effect: NoSchedule
+      {%- endif %}
