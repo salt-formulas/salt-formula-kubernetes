@@ -1,0 +1,35 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rbd-secret
+  namespace: kube-system
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
+data:
+  key: {{ salt['hashutil.base64_b64encode'](storageclass.user_key) }}
+type: kubernetes.io/rbd
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: {{ storageclass.name }}
+  {%- if storageclass.default %}
+  annotations:
+    storageclass.beta.kubernetes.io/is-default-class: "true"
+  {%- endif %}
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
+provisioner: kubernetes.io/rbd
+parameters:
+  monitors: {{ storageclass.monitors }}
+  adminId: {{ storageclass.user_id }}
+  adminSecretName: rbd-secret
+  adminSecretNamespace: kube-system
+  pool: {{ storageclass.pool }}
+  userId: {{ storageclass.user_id }}
+  userSecretName: rbd-secret
+  userSecretNamespace: kube-system
+  fsType: {{ storageclass.get('fstype', 'ext4') }}
+  imageFormat: "2"
+  imageFeatures: "layering"

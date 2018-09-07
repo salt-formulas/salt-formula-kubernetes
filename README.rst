@@ -708,6 +708,25 @@ AWS EBS storageclass integration. It also requires to create IAM policy and prof
                   server: 10.0.0.1
                   path: /exported_path
 
+Ceph RBD storageclass integration.
+
+.. code-block:: yaml
+
+    kubernetes:
+      common:
+        addons:
+          storageclass:
+            rbd:
+              enabled: True
+              default: True
+              provisioner: rbd
+              name: rbd
+              user_id: kubernetes
+              user_key: AQAOoo5bGqtPExAABGSPtThpt5s+iq97KAE+WQ==
+              monitors: cmn01:6789,cmn02:6789,cmn03:6789
+              pool: kubernetes
+              fstype: ext4
+
 Kubernetes namespaces
 ---------------------
 
