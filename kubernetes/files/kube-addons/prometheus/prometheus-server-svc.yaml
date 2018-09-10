@@ -1,0 +1,23 @@
+{%- from "kubernetes/map.jinja" import common with context -%}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-server-svc
+  namespace: {{ common.addons.prometheus.get('namespace', 'stacklight') }}
+  labels:
+    k8s-app: prometheus-server
+    version: v1
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+spec:
+  selector:
+    k8s-app: prometheus-server
+  type: NodePort
+  ports:
+  - name: webui
+    port: {{ common.addons.prometheus.server.bind.get('port', '9090') }}
+    targetPort: {{ common.addons.prometheus.server.bind.get('port', '9090') }}
+    protocol: TCP
+    # must be between 30000-32767
+    nodePort: {{ common.addons.prometheus.server.bind.get('host_port', '31990') }}
