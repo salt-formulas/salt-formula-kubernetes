@@ -16,6 +16,12 @@ spec:
       runtime: virtlet
   template:
     metadata:
+{%- if common.addons.virtlet.get('use_apparmor', False) %}
+      annotations:
+        container.apparmor.security.beta.kubernetes.io/libvirt: localhost/libvirtd
+        container.apparmor.security.beta.kubernetes.io/vms: localhost/vms
+        container.apparmor.security.beta.kubernetes.io/virtlet: localhost/virtlet
+{%- endif %}
       creationTimestamp: null
       labels:
         runtime: virtlet

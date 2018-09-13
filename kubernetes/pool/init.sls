@@ -1,4 +1,5 @@
 {%- from "kubernetes/map.jinja" import pool with context %}
+{%- from "kubernetes/map.jinja" import common with context -%}
 include:
 {%- if pool.network.get('calico', {}).get('enabled', False) %}
 - kubernetes.pool.calico
@@ -18,4 +19,7 @@ include:
 {%- endif %}
 {%- if pool.get('kube_proxy', {}).get('enabled', True) %}
 - kubernetes.pool.kube-proxy
+{%- endif %}
+{%- if common.addons.get('virtlet', {}).get('use_apparmor') and not pillar.get('kubernetes', {}).get('master', False) %}
+- kubernetes.pool.virtlet-apparmor
 {%- endif %}
