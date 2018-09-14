@@ -1,5 +1,6 @@
 {%- from "kubernetes/map.jinja" import common with context -%}
 {%- from "kubernetes/map.jinja" import master with context -%}
+{%- from "kubernetes/map.jinja" import version %}
 {%- if master.enabled %}
 
 addon-dir-create:
@@ -222,67 +223,10 @@ addon-dir-create:
 
 {%- endif %}
 
-{%- if common.addons.get('dns', {'enabled': False}).enabled %}
+{%- if salt['pkg.version_cmp'](version,'1.11') >= 0 %}
 
-/etc/kubernetes/addons/dns/kubedns-svc.yaml:
-  file.managed:
-    - source: salt://kubernetes/files/kube-addons/dns/kubedns-svc.yaml
-    - template: jinja
-    - group: root
-    - dir_mode: 755
-    - makedirs: True
-
-/etc/kubernetes/addons/dns/kubedns-rc.yaml:
-  file.managed:
-    - source: salt://kubernetes/files/kube-addons/dns/kubedns-rc.yaml
-    - template: jinja
-    - group: root
-    - dir_mode: 755
-    - makedirs: True
-
-/etc/kubernetes/addons/dns/kubedns-sa.yaml:
-  file.managed:
-    - source: salt://kubernetes/files/kube-addons/dns/kubedns-sa.yaml
-    - template: jinja
-    - group: root
-    - dir_mode: 755
-    - makedirs: True
-
-{% if common.addons.dns.get('autoscaler', {}).get('enabled', True) %}
-
-/etc/kubernetes/addons/dns/kubedns-autoscaler.yaml:
-  file.managed:
-    - source: salt://kubernetes/files/kube-addons/dns/kubedns-autoscaler.yaml
-    - template: jinja
-    - group: root
-    - dir_mode: 755
-    - makedirs: True
-
-{%- if 'RBAC' in master.auth.get('mode', "") %}
-
-/etc/kubernetes/addons/dns/kubedns-autoscaler-rbac.yaml:
-  file.managed:
-    - source: salt://kubernetes/files/kube-addons/dns/kubedns-autoscaler-rbac.yaml
-    - template: jinja
-    - group: root
-    - dir_mode: 755
-    - makedirs: True
-
-/etc/kubernetes/addons/dns/kubedns-clusterrole.yaml:
-  file.managed:
-    - source: salt://kubernetes/files/kube-addons/dns/kubedns-clusterrole.yaml
-    - template: jinja
-    - group: root
-    - dir_mode: 755
-    - makedirs: True
-
-{% endif %}
-
-{% endif %}
-
-{% endif %}
-
-{%- if common.addons.get('coredns', {}).get('enabled') %}
+/etc/kubernetes/addons/dns:
+  file.absent
 
 {%- if master.get('federation', {}).get('enabled') or (common.addons.get('externaldns', {}).get('enabled') and common.addons.get('externaldns', {}).get('provider') == "coredns") %}
 /etc/kubernetes/addons/coredns/coredns-etcd-operator-deployment.yaml:
@@ -333,6 +277,64 @@ addon-dir-create:
     - group: root
     - dir_mode: 755
     - makedirs: True
+
+{% else %}
+
+/etc/kubernetes/addons/coredns:
+  file.absent
+
+/etc/kubernetes/addons/dns/kubedns-svc.yaml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/dns/kubedns-svc.yaml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
+/etc/kubernetes/addons/dns/kubedns-rc.yaml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/dns/kubedns-rc.yaml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
+/etc/kubernetes/addons/dns/kubedns-sa.yaml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/dns/kubedns-sa.yaml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
+/etc/kubernetes/addons/dns/kubedns-autoscaler.yaml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/dns/kubedns-autoscaler.yaml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
+{%- if 'RBAC' in master.auth.get('mode', "") %}
+
+/etc/kubernetes/addons/dns/kubedns-autoscaler-rbac.yaml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/dns/kubedns-autoscaler-rbac.yaml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
+/etc/kubernetes/addons/dns/kubedns-clusterrole.yaml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/dns/kubedns-clusterrole.yaml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
+{% endif %}
+
 {% endif %}
 
 {%- if common.addons.get('externaldns', {}).get('enabled') %}
