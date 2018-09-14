@@ -1,0 +1,21 @@
+{%- from "kubernetes/map.jinja" import common with context -%}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager
+  namespace: {{ common.addons.get('alertmanager',{}).get('namespace', 'stacklight') }}
+  labels:
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+    kubernetes.io/name: "Alertmanager"
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: {{ common.addons.get('alertmanager',{}).get('bind', {}).get('port', '9093') }}
+      protocol: TCP
+      targetPort: {{ common.addons.get('alertmanager',{}).get('bind', {}).get('port', '9093') }}
+      nodePort: {{ common.addons.get('alertmanager',{}).get('bind', {}).get('node_port', '31993') }}
+  selector:
+    k8s-app: alertmanager

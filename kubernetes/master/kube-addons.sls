@@ -205,6 +205,23 @@ addon-dir-create:
 
 {%- endif %}
 
+{%- if common.addons.get('alertmanager', {'enabled': False}).enabled %}
+
+{%- set am_resources = ['deploy', 'ns', 'sa', 'svc'] %}
+{%- for resource in am_resources %}
+
+/etc/kubernetes/addons/alertmanager/alertmanager-{{ resource }}.yml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/alertmanager/alertmanager-{{ resource }}.yml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
+{%- endfor %}
+
+{%- endif %}
+
 {%- if common.addons.get('dns', {'enabled': False}).enabled %}
 
 /etc/kubernetes/addons/dns/kubedns-svc.yaml:
