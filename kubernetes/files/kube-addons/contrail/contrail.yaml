@@ -55,6 +55,10 @@ spec:
           value: "{{ salt['user.info']('contrail').get('uid', 0) }}"
         - name: CONTRAIL_GID
           value: "{{ salt['group.info']('contrail').get('gid', 0) }}"
+{%- if pillar.get('opencontrail', None) %}
+        - name: API_WORKERS
+          value: "{{ pillar.get('opencontrail').get('config', {}).get('api',{}).get('workers_count', 4) }}"
+{%- endif %}
         lifecycle:
           postStart:
             exec:
