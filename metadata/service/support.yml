@@ -8,7 +8,7 @@ parameters:
       telegraf:
         enabled: true
       collectd:
-        enabled: true
+        enabled: false
       heka:
         enabled: true
       grafana:
