@@ -23,6 +23,7 @@ spec:
       containers:
       - name: rabbitmq
         image: rabbitmq:{{ common.addons.get('contrail',{}).get('rabbitmq_version',"3.6.6") }}-management-alpine
+{% raw %}
         lifecycle:
           postStart:
             exec:
@@ -42,6 +43,7 @@ spec:
                   rabbitmqctl start_app;
                 fi;
                 rabbitmqctl set_policy ha-all "." '{"ha-mode":"exactly","ha-params":3,"ha-sync-mode":"automatic"}'
+{% endraw %}
         env:
         - name: RABBITMQ_ERLANG_COOKIE
           value: {{ common.addons.get('contrail',{}).get('rabbitmq_erlang_cookie',"YTQMGYEHFATZPDKPOCXX") }}

@@ -4,6 +4,12 @@ kubernetes:
     admin:
       password: password
       username: admin
+    apiserver:
+      address: 10.0.175.100
+      secure_port: 6443
+      internal_address: 182.22.97.1
+      insecure_address: 127.0.0.1
+      insecure_port: 8080
     version: v1.2.4
     host:
       name: node040

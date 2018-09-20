@@ -4,27 +4,35 @@
 
 {%- set network = {} %}
 {%- if pool.get('enabled', False) %}
-{%- set network = pool.get('network', {}) %}
+  {%- set network = pool.get('network', {}) %}
 {%- elif master.get('enabled', False) %}
-{%- set network = master.get('network', {}) %}
+  {%- set network = master.get('network', {}) %}
+{%- endif %}
+
+
+{%- set apiServerPoint = {} %}
+{%- if pool.get('enabled', False) %}
+  {%- set apiServerPoint = pool.get('apiserver', {}).get('host') %}
+{%- elif master.get('enabled', False) %}
+  {%- set apiServerPoint = master.get('apiserver', {}).get('address') %}
 {%- endif %}
 
 server:
   target:
     kubernetes:
       enabled: true
-      api_ip: {{ pool.apiserver.host }}
+      api_ip: {{ apiServerPoint }}
       cert_name: prometheus-server.crt
       key_name: prometheus-server.key
 {%- if network.get('calico', {}).get('enabled', False) and network.calico.get('prometheus', {}).get('enabled', False) %}
     static:
       calico:
         endpoint:
-{%- if pool.get('enabled', False) %}
+  {%- if pool.get('enabled', False) %}
           - address: {{ network.calico.prometheus.get('address', pool.address) }}
-{%- else %}
+  {%- else %}
           - address: {{ network.calico.prometheus.get('address', master.address) }}
-{%- endif %}
+  {%- endif %}
             port: {{ network.calico.prometheus.get('port', 9091) }}
 {%- endif %}
   recording:
@@ -253,3 +261,6 @@ server:
         description: "All Calico {{ $labels.process_name }} processes are down for 2 minutes."
     {% endraw %}
 {% endif %}
+{#
+# vim: ft=jinja
+#}
