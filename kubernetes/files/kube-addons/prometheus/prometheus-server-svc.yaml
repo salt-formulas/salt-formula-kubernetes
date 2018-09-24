@@ -13,11 +13,9 @@ metadata:
 spec:
   selector:
     k8s-app: prometheus-server
-  type: NodePort
+  type: LoadBalancer
   ports:
   - name: webui
     port: {{ common.addons.prometheus.server.bind.get('port', '9090') }}
     targetPort: {{ common.addons.prometheus.server.bind.get('port', '9090') }}
     protocol: TCP
-    # must be between 30000-32767
-    nodePort: {{ common.addons.prometheus.server.bind.get('host_port', '31990') }}
