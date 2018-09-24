@@ -67,6 +67,10 @@ DAEMON_ARGS="\
 {%- endif %}
 --enable-controller-attach-detach={{ pool.get('enable-controller-attach-detach', 'false') }} \
 {%- endif %}
+{%- if common.get('containerd', {}).get('enabled') and not common.addons.get('virtlet', {}).get('enabled') %}
+--container-runtime={{ pool.get('container-runtime', 'remote') }} \
+--container-runtime-endpoint={{ pool.get('image-service-endpoint', 'unix:///run/containerd/containerd.sock') }} \
+{%- endif %}
 {%- for key, value in pool.get('kubelet', {}).get('daemon_opts', {}).items() %}
 --{{ key }}={{ value }} \
 {%- endfor %}

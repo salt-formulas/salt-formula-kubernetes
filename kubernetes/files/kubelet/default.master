@@ -31,6 +31,10 @@ DAEMON_ARGS="\
 --cloud-config=/etc/kubernetes/cloud-config.conf \
 {%- endif %}
 {%- endif %}
+{%- if common.get('containerd', {}).get('enabled') %}
+--container-runtime={{ pool.get('container-runtime', 'remote') }} \
+--container-runtime-endpoint={{ pool.get('image-service-endpoint', 'unix:///run/containerd/containerd.sock') }} \
+{%- endif %}
 {%- for key, value in master.get('kubelet', {}).get('daemon_opts', {}).items() %}
 --{{ key }}={{ value }} \
 {%- endfor %}

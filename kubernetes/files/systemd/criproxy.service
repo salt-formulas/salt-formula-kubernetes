@@ -1,3 +1,4 @@
+{%- from "kubernetes/map.jinja" import common with context -%}
 {%- from "kubernetes/map.jinja" import pool with context -%}
 {%- from "kubernetes/map.jinja" import master with context -%}
 {%- from "kubernetes/map.jinja" import version %}
@@ -11,7 +12,11 @@ Requires=dockershim.service
 SyslogIdentifier=criproxy
 User=root
 ExecStart=/usr/bin/criproxy -alsologtostderr \
+          {%- if common.get('containerd', {}).get('enabled') %}
+          -connect /run/containerd/containerd.sock,virtlet.cloud:/run/virtlet.sock \
+          {%- else %}
           -connect /var/run/dockershim.sock,virtlet.cloud:/run/virtlet.sock \
+          {%- endif %}
           -listen /var/run/criproxy.sock \
           -v 3 \
           -alsologtostderr \
