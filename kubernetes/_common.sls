@@ -41,6 +41,34 @@ hyperkube-copy:
     - onlyif: /bin/false
     {%- endif %}
 
+{%- if common.get('containerd', {}).get('enabled') %}
+
+containerd_pkg:
+  pkg.installed:
+  - name: {{ common.containerd.get('package', 'containerd.io') }}
+
+runc_pkg:
+  pkg.installed:
+  - name: {{ common.containerd.get('runc_package', 'runc') }}
+
+/etc/containerd/config.toml:
+  file.absent
+
+containerd_service:
+  service.running:
+  - name: containerd
+  - enable: True
+  - watch:
+    - file: /etc/containerd/config.toml
+  - require:
+    - containerd_pkg
+    - runc_pkg
+  {%- if grains.get('noservices') %}
+  - onlyif: /bin/false
+  {%- endif %}
+
+{%- endif %}
+
 {%- if common.addons.get('virtlet', {}).get('enabled') %}
 
 /usr/bin/criproxy:
@@ -54,6 +82,8 @@ hyperkube-copy:
     {%- if grains.get('noservices') %}
     - onlyif: /bin/false
     {%- endif %}
+
+{%- if not common.get('containerd', {}).get('enabled') %}
 
 {%- if not pillar.kubernetes.pool is defined %}
 
@@ -77,30 +107,9 @@ hyperkube-copy:
 
 {%- endif %}
 
-/etc/criproxy:
-  file.directory:
-    - user: root
-    - group: root
-    - mode: 0750
-
-/etc/criproxy/node.conf:
-  file.managed:
-    - user: root
-    - group: root
-    - mode: 0640
-    - contents: ''
-
 /etc/systemd/system/dockershim.service:
   file.managed:
     - source: salt://kubernetes/files/systemd/dockershim.service
-    - template: jinja
-    - user: root
-    - group: root
-    - mode: 755
-
-/etc/systemd/system/criproxy.service:
-  file.managed:
-    - source: salt://kubernetes/files/systemd/criproxy.service
     - template: jinja
     - user: root
     - group: root
@@ -116,6 +125,29 @@ dockershim_service:
   {%- if grains.get('noservices') %}
   - onlyif: /bin/false
   {%- endif %}
+
+{%- endif %}
+
+/etc/criproxy:
+  file.directory:
+    - user: root
+    - group: root
+    - mode: 0750
+
+/etc/criproxy/node.conf:
+  file.managed:
+    - user: root
+    - group: root
+    - mode: 0640
+    - contents: ''
+
+/etc/systemd/system/criproxy.service:
+  file.managed:
+    - source: salt://kubernetes/files/systemd/criproxy.service
+    - template: jinja
+    - user: root
+    - group: root
+    - mode: 755
 
 criproxy_service:
   service.running:
@@ -134,10 +166,12 @@ criproxy_service:
 /etc/criproxy:
   file.absent
 
+{%- if not common.get('containerd', {}).get('enabled') %}
 dockershim_service:
   service.dead:
   - name: dockershim
   - enable: False
+{%- endif %}
 
 criproxy_service:
   service.dead:
