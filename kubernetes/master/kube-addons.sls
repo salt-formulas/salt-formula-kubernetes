@@ -467,4 +467,14 @@ addon-dir-create:
 
 {% endif %}
 
+{%- if common.addons.get('ingress-nginx', {}).get('enabled', False) %}
+/etc/kubernetes/addons/ingress/ingress-nginx.yaml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/ingress-nginx/ingress-nginx.yaml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+{% endif %}
+
 {% endif %}
