@@ -41,6 +41,14 @@ generate_admin_kube_config:
     - mode: 644
     - makedirs: True
 
+/etc/kubernetes/addons/namespace.yaml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addon-manager/namespace.yaml
+    - user: root
+    - group: root
+    - mode: 644
+    - makedirs: True
+
 kube-addon-manager_service:
   service.running:
   - name: kube-addon-manager
