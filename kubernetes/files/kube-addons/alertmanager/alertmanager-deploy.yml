@@ -7,7 +7,6 @@ metadata:
   namespace: {{ common.addons.get('alertmanager',{}).get('namespace', 'stacklight') }}
   labels:
     k8s-app: alertmanager
-    kubernetes.io/cluster-service: "true"
     addonmanager.kubernetes.io/mode: Reconcile
 spec:
   replicas: 2

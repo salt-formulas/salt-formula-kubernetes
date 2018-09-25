@@ -4,7 +4,6 @@ kind: Service
 metadata:
   labels:
     k8s-app: heapster
-    kubernetes.io/cluster-service: 'true'
     kubernetes.io/name: 'Heapster'
     addonmanager.kubernetes.io/mode: Reconcile
   name: heapster-address
