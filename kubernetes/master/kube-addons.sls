@@ -46,25 +46,6 @@ addon-dir-create:
     - group: root
     - dir_mode: 755
     - makedirs: True
-
-{%- elif master.network.get('opencontrail', {}).get('enabled', False) and master.network.opencontrail.get('version', 3.0) > 3.0 %}
-
-/etc/kubernetes/addons/contrail/contrail.yaml:
-  file.managed:
-    - source: salt://kubernetes/files/kube-addons/contrail/contrail.yaml
-    - template: jinja
-    - group: root
-    - dir_mode: 755
-    - makedirs: True
-
-/etc/kubernetes/addons/contrail/kube-manager.yaml:
-  file.managed:
-    - source: salt://kubernetes/files/kube-addons/contrail/kube-manager.yaml
-    - template: jinja
-    - group: root
-    - dir_mode: 755
-    - makedirs: True
-
 {% endif %}
 
 {%- if common.addons.get('virtlet', {}).get('enabled') %}
