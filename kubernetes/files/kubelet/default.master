@@ -2,6 +2,21 @@
 {%- from "kubernetes/map.jinja" import master with context -%}
 {%- from "kubernetes/map.jinja" import version %}
 
+{%- if master.get('network', {}).get('opencontrail', {}).get('enabled', false) %}
+{%- if master.get('network', {}).get('opencontrail', {}).get('version', 3.0) >= 4.0 %}
+{%- if master.get('enabled', false) %}
+{# in case of OC4 there should not be CNI used #}
+{%- set add_networking_plugin_conf = False %}
+{%- endif %}
+{%- else %}
+{# in case of OC3 CNI should be everywhere #}
+{%- set add_networking_plugin_conf = True %}
+{%- endif %}
+{%- else %}
+{# In case of calico or any compute node - CNI should be everywhere #}
+{%- set add_networking_plugin_conf = True %}
+{%- endif %}
+
 # test_args has to be kept at the end, so they'll overwrite any prior configuration
 DAEMON_ARGS="\
 --pod-manifest-path=/etc/kubernetes/manifests \
@@ -9,7 +24,10 @@ DAEMON_ARGS="\
 --allow-privileged={{ master.kubelet.allow_privileged }} \
 --cluster_dns={{ common.addons.dns.server }} \
 --cluster_domain={{ common.addons.dns.domain|replace('_', '-') }} \
+{%- if add_networking_plugin_conf %}
+--network-plugin=cni \
 --cni-bin-dir={{ master.apiserver.get('cni_bin_dir', '/opt/cni/bin') }} \
+{%- endif %}
 --hostname-override={{ master.host.name }} \
 --v={{ master.get('verbosity', 2) }} \
 --node-labels=node-role.kubernetes.io/master=true \
@@ -32,8 +50,8 @@ DAEMON_ARGS="\
 {%- endif %}
 {%- endif %}
 {%- if common.get('containerd', {}).get('enabled') %}
---container-runtime={{ pool.get('container-runtime', 'remote') }} \
---container-runtime-endpoint={{ pool.get('image-service-endpoint', 'unix:///run/containerd/containerd.sock') }} \
+--container-runtime={{ master.get('container-runtime', 'remote') }} \
+--container-runtime-endpoint={{ master.get('container-runtime-endpoint', 'unix:///run/containerd/containerd.sock') }} \
 {%- endif %}
 {%- for key, value in master.get('kubelet', {}).get('daemon_opts', {}).items() %}
 --{{ key }}={{ value }} \
