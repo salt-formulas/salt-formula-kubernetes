@@ -14,5 +14,28 @@
 #  - template: jinja
 #  - makedirs: True
 
+addon-dir-create-in-oc:
+  file.directory:
+    - name: /etc/kubernetes/addons
+    - user: root
+    - group: root
+    - mode: 0755
+
+/etc/kubernetes/addons/contrail/contrail.yaml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/contrail/contrail.yaml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
+/etc/kubernetes/addons/contrail/kube-manager.yaml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/contrail/kube-manager.yaml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
 {%- endif %}
 {%- endif %}
