@@ -33,7 +33,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: alertmanager
   labels:
-    kubernetes.io/cluster-service: "true"
     addonmanager.kubernetes.io/mode: Reconcile
 roleRef:
   kind: ClusterRole

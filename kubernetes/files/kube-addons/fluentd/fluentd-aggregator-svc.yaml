@@ -7,7 +7,6 @@ metadata:
   namespace: {{ common.addons.fluentd.get('namespace', 'stacklight') }}
   labels:
     k8s-app: fluentd-aggregator
-    kubernetes.io/cluster-service: "true"
     kubernetes.io/name: "fluentd-aggregator"
     addonmanager.kubernetes.io/mode: Reconcile
 spec:

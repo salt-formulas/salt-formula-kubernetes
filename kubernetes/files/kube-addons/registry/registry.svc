@@ -6,7 +6,6 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: kube-registry
-    kubernetes.io/cluster-service: "true"
     kubernetes.io/name: "KubeRegistry"
     addonmanager.kubernetes.io/mode: Reconcile
 spec:

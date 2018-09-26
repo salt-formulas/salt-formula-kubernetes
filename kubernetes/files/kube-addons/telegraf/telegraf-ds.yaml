@@ -8,7 +8,6 @@ metadata:
   labels:
     k8s-app: telegraf
     version: v1
-    kubernetes.io/cluster-service: "true"
     beta.kubernetes.io/telegraf-ds-ready: "true"
 spec:
   template:
@@ -16,7 +15,6 @@ spec:
       labels:
         k8s-app: telegraf
         version: v1
-        kubernetes.io/cluster-service: "true"
       annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ''
         seccomp.security.alpha.kubernetes.io/pod: 'docker/default'

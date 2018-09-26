@@ -8,7 +8,6 @@ metadata:
   labels:
     k8s-app: fluentd-logger
     version: v1
-    kubernetes.io/cluster-service: "true"
     beta.kubernetes.io/fluentd-ds-ready: "true"
 spec:
   template:
@@ -16,7 +15,6 @@ spec:
       labels:
         k8s-app: fluentd-logger
         version: v1
-        kubernetes.io/cluster-service: "true"
       # This annotation ensures that fluentd does not get evicted if the node
       # supports critical pod annotation based priority scheme.
       # Note that this does not guarantee admission on the nodes (#40573).

@@ -7,7 +7,6 @@ metadata:
   namespace: {{ common.addons.coredns.namespace }}
   labels:
     k8s-app: coredns
-    kubernetes.io/cluster-service: "true"
     kubernetes.io/name: "CoreDNS"
     addonmanager.kubernetes.io/mode: Reconcile
 spec:
