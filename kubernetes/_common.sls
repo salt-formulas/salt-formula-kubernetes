@@ -69,33 +69,9 @@ containerd_service:
 
 {%- endif %}
 
-{%- if common.addons.get('virtlet', {}).get('enabled') %}
-
-/usr/bin/criproxy:
-  file.managed:
-    - source: https://github.com/mirantis/criproxy/releases/download/{{ common.addons.virtlet.get('criproxy_version', 'v0.10.0') }}/criproxy
-    - mode: 750
-    - makedirs: true
-    - user: root
-    - group: root
-    - source_hash: {{ common.addons.virtlet.get('criproxy_source', 'md5=52717b1f70f15558ef4bdb0e4d4948da') }}
-    {%- if grains.get('noservices') %}
-    - onlyif: /bin/false
-    {%- endif %}
+{%- if common.addons.get('virtlet', {}).get('enabled') and not pillar.kubernetes.master is defined %}
 
 {%- if not common.get('containerd', {}).get('enabled') %}
-
-{%- if not pillar.kubernetes.pool is defined %}
-
-/etc/default/dockershim:
-  file.managed:
-  - source: salt://kubernetes/files/dockershim/default.master
-  - template: jinja
-  - user: root
-  - group: root
-  - mode: 644
-
-{%- else %}
 
 /etc/default/dockershim:
   file.managed:
@@ -104,8 +80,6 @@ containerd_service:
   - user: root
   - group: root
   - mode: 644
-
-{%- endif %}
 
 /etc/systemd/system/dockershim.service:
   file.managed:
@@ -127,6 +101,18 @@ dockershim_service:
   {%- endif %}
 
 {%- endif %}
+
+/usr/bin/criproxy:
+  file.managed:
+    - source: https://github.com/mirantis/criproxy/releases/download/{{ common.addons.virtlet.get('criproxy_version', 'v0.10.0') }}/criproxy
+    - mode: 750
+    - makedirs: true
+    - user: root
+    - group: root
+    - source_hash: {{ common.addons.virtlet.get('criproxy_source', 'md5=52717b1f70f15558ef4bdb0e4d4948da') }}
+    {%- if grains.get('noservices') %}
+    - onlyif: /bin/false
+    {%- endif %}
 
 /etc/criproxy:
   file.directory:
@@ -166,12 +152,10 @@ criproxy_service:
 /etc/criproxy:
   file.absent
 
-{%- if not common.get('containerd', {}).get('enabled') %}
 dockershim_service:
   service.dead:
   - name: dockershim
   - enable: False
-{%- endif %}
 
 criproxy_service:
   service.dead:
@@ -202,7 +186,7 @@ criproxy_service:
 
 {% endif %}
 
-{%- if not pillar.kubernetes.pool is defined %}
+{%- if pillar.kubernetes.master is defined %}
 
 /etc/default/kubelet:
   file.managed:
