@@ -25,11 +25,20 @@ spec:
     spec:
       serviceAccountName: fluentd
       tolerations:
-        - key: node-role.kubernetes.io/master
-          effect: NoSchedule
+        - key: "node-role.kubernetes.io/master"
+          effect: "NoSchedule"
+          operator: "Exists"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: node-role.kubernetes.io/master
+                  operator: In
+                  values: ["true"]
       containers:
       - name: fluentd-aggregator
-        image: {{ common.addons.fluentd.aggregator.get('image', 'fluent/fluentd-kubernetes-daemonset:v1.2-debian-elasticsearch') }}
+        image: {{ common.addons.fluentd.aggregator.get('image', 'docker-prod-local.docker.mirantis.net/mirantis/external/fluentd-kubernetes-daemonset:stable') }}
         env:
           - name: FLUENTD_ELASTICSEARCH_HOST
             value: "{{ common.addons.fluentd.aggregator.config.output.es.get('host', '127.0.0.1') }}"
@@ -38,7 +47,7 @@ spec:
           - name: FLUENTD_ELASTICSEARCH_SCHEME
             value: "{{ common.addons.fluentd.aggregator.config.output.es.get('scheme', 'http') }}"
           - name: FLUENTD_AGGREGATOR_BIND_PORT
-            value: "{{ common.addons.fluentd.aggregator.config.forward_input.bind.get('port', '24224') }}"
+            value: "{{ common.addons.fluentd.aggregator.bind.get('port', '24224') }}"
           - name: ENVIRONMENT_LABEL
             value: "{{ grains.domain }}"
          # TODO: a hack to pass the broken entrypoint in upstream docker image for k8s fluent when configmap is used
@@ -52,17 +61,14 @@ spec:
           requests:
             memory: {{ common.addons.fluentd.aggregator.resources.requests.get('memory', '500Mi') }}
         ports:
-        - containerPort: {{ common.addons.fluentd.aggregator.config.forward_input.bind.get('port', '24224') }}
+        - containerPort: {{ common.addons.fluentd.aggregator.bind.get('port', '24224') }}
           name: main-input
           protocol: TCP
-        - containerPort: 9880
-          name: health-check
-          protocol: TCP
         volumeMounts:
-        - name: fluentd-aggregator-config
-          mountPath: /fluentd/etc
+        - name: fluentd-aggregator-cfg
+          mountPath: {{ common.addons.fluentd.aggregator.config.get('config_dir', '/fluentd/etc') }}
           readOnly: false
       volumes:
-      - name: fluentd-aggregator-config
+      - name: fluentd-aggregator-cfg
         configMap:
           name: fluentd-aggregator-cfg

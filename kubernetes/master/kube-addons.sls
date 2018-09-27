@@ -388,19 +388,6 @@ addon-dir-create:
 
 {%- endfor %}
 
-{%- set fluentd_logger_resources = ['fluent-conf', 'ds'] %}
-{%- for resource in fluentd_logger_resources %}
-
-/etc/kubernetes/addons/fluentd/fluentd-logger-{{ resource }}.yaml:
-  file.managed:
-    - source: salt://kubernetes/files/kube-addons/fluentd/fluentd-logger-{{ resource }}.yaml
-    - template: jinja
-    - group: root
-    - dir_mode: 755
-    - makedirs: True
-
-{%- endfor %}
-
 {% endif %}
 
 {%- if common.addons.get('telegraf', {}).get('enabled') %}
