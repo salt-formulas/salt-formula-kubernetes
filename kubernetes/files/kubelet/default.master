@@ -19,20 +19,21 @@
 
 # test_args has to be kept at the end, so they'll overwrite any prior configuration
 DAEMON_ARGS="\
+--kubeconfig=/etc/kubernetes/kubelet.kubeconfig \
 --pod-manifest-path=/etc/kubernetes/manifests \
 --address={{ master.kubelet.address }} \
 --allow-privileged={{ master.kubelet.allow_privileged }} \
 --cluster_dns={{ common.addons.dns.server }} \
 --cluster_domain={{ common.addons.dns.domain|replace('_', '-') }} \
-{%- if add_networking_plugin_conf %}
---network-plugin=cni \
---cni-bin-dir={{ master.apiserver.get('cni_bin_dir', '/opt/cni/bin') }} \
-{%- endif %}
 --hostname-override={{ master.host.name }} \
 --v={{ master.get('verbosity', 2) }} \
 --node-labels=node-role.kubernetes.io/master=true \
 {%- if common.hyperkube.pause_image is defined %}
 --pod-infra-container-image={{ common.hyperkube.pause_image }} \
+{%- endif %}
+{%- if add_networking_plugin_conf %}
+--network-plugin=cni \
+--cni-bin-dir={{ master.apiserver.get('cni_bin_dir', '/opt/cni/bin') }} \
 {%- endif %}
 {%- if salt['pkg.version_cmp'](version,'1.8') >= 0 %}
 --fail-swap-on={{ master.kubelet.fail_on_swap }} \
