@@ -6,7 +6,7 @@ metadata:
   name: external-dns
   namespace: {{ common.addons.externaldns.namespace }}
   labels:
-    k8s-app: externaldns
+    app: external-dns
     addonmanager.kubernetes.io/mode: Reconcile
 spec:
   replicas: 1
@@ -24,6 +24,7 @@ spec:
       tolerations:
         - key: node-role.kubernetes.io/master
           effect: NoSchedule
+      serviceAccountName: externaldns
       containers:
       - name: external-dns
         image: {{ common.addons.externaldns.image }}

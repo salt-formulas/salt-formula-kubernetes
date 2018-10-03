@@ -15,14 +15,14 @@ data:
         etcd {{ master.federation.name }} {
           stubzones
           path /skydns
-          endpoint http://coredns-etcd-cluster-client:2379
+          endpoint http://{{ common.addons.coredns.etcd.client_address }}:2379
         }
 {% endif %}
 {% if common.addons.externaldns.enabled %}
         etcd {{ common.addons.externaldns.domain }} {
           stubzones
           path /skydns
-          endpoint http://coredns-etcd-cluster-client:2379
+          endpoint http://{{ common.addons.coredns.etcd.client_address }}:2379
         }
 {% endif %}
         errors

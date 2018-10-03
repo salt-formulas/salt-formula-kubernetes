@@ -1,0 +1,21 @@
+{%- from "kubernetes/map.jinja" import common with context -%}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coredns-etcd-cluster-client
+  namespace: {{ common.addons.coredns.namespace }}
+  labels:
+    app: coredns-etcd-operator
+    etcd_cluster: coredns-etcd-cluster
+    addonmanager.kubernetes.io/mode: Reconcile
+spec:
+  clusterIP: {{ common.addons.coredns.etcd.client_address }}
+  ports:
+  - name: client
+    port: 2379
+    protocol: TCP
+    targetPort: 2379
+  selector:
+    etcd_cluster: coredns-etcd-cluster
+  type: ClusterIP

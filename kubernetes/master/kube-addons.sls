@@ -225,6 +225,22 @@ addon-dir-create:
     - group: root
     - dir_mode: 755
     - makedirs: True
+
+/etc/kubernetes/addons/coredns/coredns-etcd-cluster-svc.yml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/coredns/coredns-etcd-cluster-svc.yml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
+/etc/kubernetes/addons/coredns/coredns-etcd-operator-rbac.yml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/coredns/coredns-etcd-operator-rbac.yml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
 {% endif %}
 
 /etc/kubernetes/addons/coredns/coredns-cm.yml:
@@ -322,6 +338,14 @@ addon-dir-create:
 /etc/kubernetes/addons/externaldns/externaldns-deploy.yaml:
   file.managed:
     - source: salt://kubernetes/files/kube-addons/externaldns/externaldns-deploy.yml
+    - template: jinja
+    - group: root
+    - dir_mode: 755
+    - makedirs: True
+
+/etc/kubernetes/addons/externaldns/externaldns-rbac.yml:
+  file.managed:
+    - source: salt://kubernetes/files/kube-addons/externaldns/externaldns-rbac.yml
     - template: jinja
     - group: root
     - dir_mode: 755

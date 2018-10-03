@@ -27,9 +27,12 @@ spec:
       tolerations:
         - key: node-role.kubernetes.io/master
           effect: NoSchedule
+      serviceAccountName: etcd-operator
       containers:
       - name: coredns-etcd-operator
         image: {{ common.addons.coredns.etcd.operator_image }}
+        command:
+        - etcd-operator
         env:
         - name: MY_POD_NAMESPACE
           valueFrom:
