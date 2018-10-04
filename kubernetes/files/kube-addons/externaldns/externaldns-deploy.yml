@@ -21,9 +21,11 @@ spec:
         cni: {{ common.addons.externaldns.cni }}
 {%- endif %}
     spec:
+      {%- if not salt['pillar.get']('kubernetes').get('master', {}).get('network', {}).get('opencontrail', {}).get('enabled', false) %}
       tolerations:
         - key: node-role.kubernetes.io/master
           effect: NoSchedule
+      {%- endif %}
       serviceAccountName: externaldns
       containers:
       - name: external-dns

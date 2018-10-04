@@ -24,9 +24,11 @@ spec:
         cni: {{ common.addons.coredns.cni }}
 {%- endif %}
     spec:
+      {%- if not salt['pillar.get']('kubernetes').get('master', {}).get('network', {}).get('opencontrail', {}).get('enabled', false) %}
       tolerations:
         - key: node-role.kubernetes.io/master
           effect: NoSchedule
+      {%- endif %}
       serviceAccountName: etcd-operator
       containers:
       - name: coredns-etcd-operator
