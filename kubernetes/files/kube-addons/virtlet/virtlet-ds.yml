@@ -107,8 +107,8 @@ spec:
         - name: KUBELET_ROOT_DIR
           valueFrom:
             configMapKeyRef:
-              name: virtlet-config
               key: kubelet_root_dir
+              name: virtlet-config
               optional: true
         - name: VIRTLET_IMAGE_TRANSLATIONS_DIR
           value: /etc/virtlet/images
@@ -197,9 +197,11 @@ spec:
         - mountPath: /boot
           name: boot
           readOnly: true
+        - mountPath: /dev
+          name: dev
         - mountPath: /var/lib/virtlet
-          name: virtlet
           mountPropagation: Bidirectional
+          name: virtlet
         - mountPath: /var/lib/libvirt
           name: libvirt
         - mountPath: /var/run/libvirt
@@ -217,6 +219,9 @@ spec:
           name: pods-log
         - mountPath: /var/log/libvirt
           name: libvirt-log
+        - mountPath: /var/run/netns
+          mountPropagation: Bidirectional
+          name: netns-dir
 
       - name: vms
         command:
@@ -289,6 +294,9 @@ spec:
       - hostPath:
           path: /var/log/pods
         name: pods-log
+      - hostPath:
+          path: /var/run/netns
+        name: netns-dir
       - configMap:
           name: virtlet-image-translations
         name: image-name-translations
@@ -528,6 +536,8 @@ spec:
                   type: string
                 imageTranslationConfigsDir:
                   type: string
+                kubeletRootDir:
+                  type: string
                 libvirtURI:
                   type: string
                 logLevel:
@@ -538,6 +548,10 @@ spec:
                   type: string
                 skipImageTranslation:
                   type: boolean
+                streamPort:
+                  maximum: 65535
+                  minimum: 1
+                  type: integer
             nodeName:
               type: string
             nodeSelector:
