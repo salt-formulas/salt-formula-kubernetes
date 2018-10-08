@@ -45,14 +45,15 @@ hyperkube-copy:
 
 containerd_pkg:
   pkg.installed:
-  - name: {{ common.containerd.get('package', 'containerd.io') }}
-
-runc_pkg:
-  pkg.installed:
-  - name: {{ common.containerd.get('runc_package', 'runc') }}
+  - name: {{ common.get('containerd', {}).get('package', 'containerd.io') }}
 
 /etc/containerd/config.toml:
-  file.absent
+  file.managed:
+  - source: salt://kubernetes/files/containerd/config.toml
+  - template: jinja
+  - user: root
+  - group: root
+  - mode: 644
 
 containerd_service:
   service.running:
@@ -62,11 +63,38 @@ containerd_service:
     - file: /etc/containerd/config.toml
   - require:
     - containerd_pkg
-    - runc_pkg
   {%- if grains.get('noservices') %}
   - onlyif: /bin/false
   {%- endif %}
 
+extract_crictl:
+  archive.extracted:
+    - name: /tmp/crictl
+    - source: {{ common.containerd.crictl.source }}
+    - source_hash: {{ common.containerd.crictl.hash }}
+    - enforce_toplevel: false
+    - options: xzf
+    - archive_format: tar
+    - keep: true
+    {%- if grains.get('noservices') %}
+    - onlyif: /bin/false
+    {%- endif %}
+
+/usr/local/bin/crictl:
+  file.managed:
+  - source: /tmp/crictl/crictl
+  - mode: 755
+  - owner: root
+  - group: root
+  - require:
+    - archive: extract_crictl
+
+/etc/crictl.yaml:
+  file.managed:
+  - user: root
+  - group: root
+  - mode: 644
+  - contents: 'runtime-endpoint: unix:///run/containerd/containerd.sock'
 {%- endif %}
 
 {%- if common.addons.get('virtlet', {}).get('enabled') and not pillar.kubernetes.master is defined %}

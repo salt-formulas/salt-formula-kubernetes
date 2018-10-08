@@ -5,8 +5,13 @@
 
 [Unit]
 Description=CRI Proxy
+{%- if common.get('containerd', {}).get('enabled') %}
+After=containerd.service
+Requires=containerd.service
+{%- else %}
 After=dockershim.service
 Requires=dockershim.service
+{%- endif %}
 
 [Service]
 SyslogIdentifier=criproxy
