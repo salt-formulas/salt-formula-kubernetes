@@ -3,7 +3,7 @@
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: {{ common.addons.prometheus.get('namespace', 'stacklight') }}
+  name: {{ common.addons.prometheus.get('namespace') }}
   labels:
     k8s-app: prometheus
     addonmanager.kubernetes.io/mode: Reconcile

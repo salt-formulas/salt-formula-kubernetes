@@ -4,13 +4,15 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: fluentd-aggregator
-  namespace: {{ common.addons.fluentd.get('namespace', 'stacklight') }}
+  namespace: {{ common.addons.fluentd.get('namespace') }}
   labels:
     k8s-app: fluentd-aggregator
     version: v1
     addonmanager.kubernetes.io/mode: Reconcile
 spec:
-  replicas: 1
+{%- if common.addons.fluentd.get('replicas', 1) != 1 %}
+  replicas: {{ common.addons.fluentd.aggregator.replicas }}
+{%- endif %}
   selector:
     matchLabels:
       k8s-app: fluentd-aggregator
@@ -38,16 +40,20 @@ spec:
                   values: ["true"]
       containers:
       - name: fluentd-aggregator
-        image: {{ common.addons.fluentd.aggregator.get('image', 'docker-prod-local.docker.mirantis.net/mirantis/external/fluentd-kubernetes-daemonset:stable') }}
+        image: {{ common.addons.fluentd.aggregator.get('image') }}
         env:
           - name: FLUENTD_ELASTICSEARCH_HOST
-            value: "{{ common.addons.fluentd.aggregator.config.output.es.get('host', '127.0.0.1') }}"
+            value: "{{ common.addons.fluentd.aggregator.config.output.elasticsearch.get('host') }}"
           - name: FLUENTD_ELASTICSEARCH_PORT
-            value: "{{ common.addons.fluentd.aggregator.config.output.es.get('port', '9200') }}"
+            value: "{{ common.addons.fluentd.aggregator.config.output.elasticsearch.get('port') }}"
           - name: FLUENTD_ELASTICSEARCH_SCHEME
-            value: "{{ common.addons.fluentd.aggregator.config.output.es.get('scheme', 'http') }}"
+            value: "{{ common.addons.fluentd.aggregator.config.output.elasticsearch.get('scheme') }}"
+          - name: FLUENTD_ELASTICSEARCH_SSL_VERIFY
+            value: "{{ common.addons.fluentd.aggregator.config.output.elasticsearch.get('ssl_verify') | lower }}"
+          - name: FLUENTD_ELASTICSEARCH_RELOAD_CONNECTIONS
+            value: "{{ common.addons.fluentd.aggregator.config.output.elasticsearch.get('reload_connections') | lower }}"
           - name: FLUENTD_AGGREGATOR_BIND_PORT
-            value: "{{ common.addons.fluentd.aggregator.bind.get('port', '24224') }}"
+            value: "{{ common.addons.fluentd.aggregator.bind.get('port') }}"
           - name: ENVIRONMENT_LABEL
             value: "{{ grains.domain }}"
          # TODO: a hack to pass the broken entrypoint in upstream docker image for k8s fluent when configmap is used
@@ -57,16 +63,16 @@ spec:
             value: "null"
         resources:
           limits:
-            memory: {{ common.addons.fluentd.aggregator.resources.limits.get('memory', '500Mi') }}
+            memory: {{ common.addons.fluentd.aggregator.resources.limits.get('memory') }}
           requests:
-            memory: {{ common.addons.fluentd.aggregator.resources.requests.get('memory', '500Mi') }}
+            memory: {{ common.addons.fluentd.aggregator.resources.requests.get('memory') }}
         ports:
-        - containerPort: {{ common.addons.fluentd.aggregator.bind.get('port', '24224') }}
+        - containerPort: {{ common.addons.fluentd.aggregator.bind.get('port') }}
           name: main-input
           protocol: TCP
         volumeMounts:
         - name: fluentd-aggregator-cfg
-          mountPath: {{ common.addons.fluentd.aggregator.config.get('config_dir', '/fluentd/etc') }}
+          mountPath: {{ common.addons.fluentd.aggregator.config.get('config_dir') }}
           readOnly: false
       volumes:
       - name: fluentd-aggregator-cfg

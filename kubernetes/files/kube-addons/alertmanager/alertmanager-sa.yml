@@ -6,7 +6,7 @@ metadata:
   labels:
     addonmanager.kubernetes.io/mode: Reconcile
   name: alertmanager
-  namespace: {{ common.addons.get('alertmanager',{}).get('namespace', 'stacklight') }}
+  namespace: {{ common.addons.get('alertmanager',{}).get('namespace') }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -41,4 +41,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: alertmanager
-  namespace: {{ common.addons.get('alertmanager',{}).get('namespace', 'stacklight') }}
+  namespace: {{ common.addons.get('alertmanager',{}).get('namespace') }}

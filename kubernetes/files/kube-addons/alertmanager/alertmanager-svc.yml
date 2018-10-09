@@ -4,7 +4,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: alertmanager
-  namespace: {{ common.addons.get('alertmanager',{}).get('namespace', 'stacklight') }}
+  namespace: {{ common.addons.get('alertmanager',{}).get('namespace') }}
   labels:
     addonmanager.kubernetes.io/mode: Reconcile
     kubernetes.io/name: "Alertmanager"
@@ -12,8 +12,8 @@ spec:
   type: LoadBalancer
   ports:
     - name: http
-      port: {{ common.addons.get('alertmanager',{}).get('bind', {}).get('port', '9093') }}
+      port: {{ common.addons.get('alertmanager',{}).get('bind', {}).get('port') }}
       protocol: TCP
-      targetPort: {{ common.addons.get('alertmanager',{}).get('bind', {}).get('port', '9093') }}
+      targetPort: {{ common.addons.get('alertmanager',{}).get('bind', {}).get('port') }}
   selector:
     k8s-app: alertmanager

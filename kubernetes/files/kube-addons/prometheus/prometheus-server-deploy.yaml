@@ -4,13 +4,15 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: prometheus-server
-  namespace: {{ common.addons.prometheus.get('namespace', 'stacklight') }}
+  namespace: {{ common.addons.prometheus.get('namespace') }}
   labels:
     k8s-app: prometheus-server
     version: v1
     addonmanager.kubernetes.io/mode: Reconcile
 spec:
-  replicas: 2
+{%- if common.addons.prometheus.server.get('replicas', 1) != 1 %}
+  replicas: {{ common.addons.prometheus.server.replicas }}
+{%- endif %}
   selector:
     matchLabels:
       k8s-app: prometheus-server
@@ -38,39 +40,39 @@ spec:
                   values: ["true"]
       containers:
       - name: prometheus
-        image:  {{ common.addons.prometheus.get('image', 'docker-prod-local.artifactory.mirantis.com/openstack-docker/prometheus:stable') }}
+        image:  {{ common.addons.prometheus.server.get('image') }}
         env:
         - name: PROMETHEUS_BIND_ADDRESS
-          value: "{{ common.addons.prometheus.server.bind.get('host', '0.0.0.0') }}"
+          value: "{{ common.addons.prometheus.server.bind.get('host') }}"
         - name: PROMETHEUS_BIND_PORT
-          value: "{{ common.addons.prometheus.server.bind.get('port', '9090') }}"
+          value: "{{ common.addons.prometheus.server.bind.get('port') }}"
         - name: PROMETHEUS_CONFIG_DIR
-          value: "{{ common.addons.prometheus.server.config.get('config_dir', '/etc/prometheus') }}"
+          value: "{{ common.addons.prometheus.server.config.get('config_dir') }}"
         - name: PROMETHEUS_DATA_DIR
-          value: "{{ common.addons.prometheus.server.config.get('data_dir', '/data') }}"
+          value: "{{ common.addons.prometheus.server.config.get('data_dir') }}"
         - name: PROMETHEUS_STORAGE_LOCAL_ENGINE
-          value: "{{ common.addons.prometheus.server.config.get('storage_local_engine', 'persisted') }}"
+          value: "{{ common.addons.prometheus.server.config.get('storage_local_engine') }}"
         - name: PROMETHEUS_STORAGE_LOCAL_RETENTION
-          value: "{{ common.addons.prometheus.server.config.get('storage_local_retention', '360h') }}"
+          value: "{{ common.addons.prometheus.server.config.get('storage_local_retention') }}"
         - name: PROMETHEUS_USE_STATIC_DATADIR
-          value: "{{ common.addons.prometheus.server.config.get('use_static_datadir', 'true') | lower }}"
+          value: "{{ common.addons.prometheus.server.config.get('use_static_datadir') | lower }}"
         ports:
         - name: webui
-          containerPort: {{ common.addons.prometheus.server.bind.get('port', '9090') }}
+          containerPort: {{ common.addons.prometheus.server.bind.get('port') }}
         resources:
           requests:
-            memory: {{ common.addons.prometheus.server.resources.requests.get('memory', '500M') }}
+            memory: {{ common.addons.prometheus.server.resources.requests.get('memory') }}
           limits:
-            memory: {{ common.addons.prometheus.server.resources.limits.get('memory', '500M') }}
+            memory: {{ common.addons.prometheus.server.resources.limits.get('memory') }}
         volumeMounts:
         - name: prometheus-server-cfg
-          mountPath: "{{ common.addons.prometheus.server.config.get('config_dir', '/etc/prometheus') }}"
+          mountPath: "{{ common.addons.prometheus.server.config.get('config_dir') }}"
         - name: prometheus-server-data
-          mountPath: "{{ common.addons.prometheus.server.config.get('data_dir', '/data') }}"
+          mountPath: "{{ common.addons.prometheus.server.config.get('data_dir') }}"
       volumes:
       - name: prometheus-server-cfg
         hostPath:
-          path: "{{ common.addons.prometheus.server.config.get('host_config_dir', '/srv/volumes/local/prometheus/config') }}"
+          path: "{{ common.addons.prometheus.server.config.get('host_config_dir') }}"
       - name: prometheus-server-data
         hostPath:
-          path: "{{ common.addons.prometheus.server.config.get('host_data_dir', '/srv/volumes/local/prometheus/data') }}"
+          path: "{{ common.addons.prometheus.server.config.get('host_data_dir') }}"

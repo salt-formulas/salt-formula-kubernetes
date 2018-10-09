@@ -3,6 +3,6 @@
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: {{ common.addons.get('alertmanager',{}).get('namespace', 'stacklight') }}
+  name: {{ common.addons.get('alertmanager',{}).get('namespace') }}
   labels:
     addonmanager.kubernetes.io/mode: Reconcile

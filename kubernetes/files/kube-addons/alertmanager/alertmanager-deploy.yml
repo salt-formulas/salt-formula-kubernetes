@@ -4,7 +4,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: alertmanager
-  namespace: {{ common.addons.get('alertmanager',{}).get('namespace', 'stacklight') }}
+  namespace: {{ common.addons.get('alertmanager',{}).get('namespace') }}
   labels:
     k8s-app: alertmanager
     addonmanager.kubernetes.io/mode: Reconcile
@@ -37,19 +37,19 @@ spec:
           effect: "NoSchedule"
       containers:
       - name: alertmanager
-        image: "{{ common.addons.get('alertmanager',{}).get('image', 'docker-prod-local.artifactory.mirantis.com/openstack-docker/alertmanager:2018.8.0') }}"
+        image: "{{ common.addons.get('alertmanager',{}).get('image') }}"
         ports:
         - name: alertmanager
-          containerPort: {{ common.addons.get('alertmanager',{}).get('bind', {}).get('port', '9093') }}
+          containerPort: {{ common.addons.get('alertmanager',{}).get('bind', {}).get('port') }}
         env:
         - name: ALERTMANAGER_CONFIG_DIR
-          value: "{{ common.addons.get('alertmanager',{}).get('dir', {}).get('config', '/etc/alertmanager') }}"
+          value: "{{ common.addons.get('alertmanager',{}).get('dir', {}).get('config') }}"
         - name: ALERTMANAGER_DATA_DIR
-          value: "{{ common.addons.get('alertmanager',{}).get('dir', {}).get('data', '/data') }}"
+          value: "{{ common.addons.get('alertmanager',{}).get('dir', {}).get('data') }}"
         - name: ALERTMANAGER_BIND_PORT
-          value: "{{ common.addons.get('alertmanager',{}).get('bind', {}).get('port', '9093') }}"
+          value: "{{ common.addons.get('alertmanager',{}).get('bind', {}).get('port') }}"
         - name: ALERTMANAGER_BIND_ADDRESS
-          value: "{{ common.addons.get('alertmanager',{}).get('bind', {}).get('address', '0.0.0.0') }}"
+          value: "{{ common.addons.get('alertmanager',{}).get('bind', {}).get('address') }}"
         - name: ALERTMANAGER_DISCOVERY_DOMAIN
           value: "*.alertmanager.stacklight"
         - name: ALERTMANAGER_USE_STATIC_DATADIR
@@ -58,13 +58,13 @@ spec:
           value: "True"
         volumeMounts:
         - name: config-volume
-          mountPath: "{{ common.addons.get('alertmanager',{}).get('dir', {}).get('config', '/etc/alertmanager') }}"
+          mountPath: "{{ common.addons.get('alertmanager',{}).get('dir', {}).get('config') }}"
         - name: data-volume
-          mountPath: "{{ common.addons.get('alertmanager',{}).get('dir', {}).get('data', '/data') }}"
+          mountPath: "{{ common.addons.get('alertmanager',{}).get('dir', {}).get('data') }}"
       volumes:
       - name: config-volume
         hostPath:
-          path: "{{ common.addons.get('alertmanager',{}).get('dir', {}).get('host_config', '/srv/volumes/local/alertmanager/config') }}"
+          path: "{{ common.addons.get('alertmanager',{}).get('dir', {}).get('host_config') }}"
       - name: data-volume
         hostPath:
-          path: "{{ common.addons.get('alertmanager',{}).get('dir', {}).get('host_data', '/srv/volumes/local/alertmanager/data') }}"
+          path: "{{ common.addons.get('alertmanager',{}).get('dir', {}).get('host_data') }}"

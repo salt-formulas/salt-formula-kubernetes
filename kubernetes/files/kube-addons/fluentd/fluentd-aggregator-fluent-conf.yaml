@@ -4,7 +4,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: fluentd-aggregator-cfg
-  namespace: {{ common.addons.fluentd.get('namespace', 'stacklight') }}
+  namespace: {{ common.addons.fluentd.get('namespace') }}
   labels:
     addonmanager.kubernetes.io/mode: Reconcile
 data:
@@ -28,25 +28,25 @@ data:
   output.conf: |
     <match **>
       @type elasticsearch
-      @log_level {{ common.addons.fluentd.aggregator.config.output.get('log_level', 'info') }}
+      @log_level {{ common.addons.fluentd.aggregator.config.output.elasticsearch.get('log_level') }}
       host "#{ENV['FLUENTD_ELASTICSEARCH_HOST']}"
       port "#{ENV['FLUENTD_ELASTICSEARCH_PORT']}"
-      scheme "#{ENV['FLUENTD_ELASTICSEARCH_SCHEME'] || 'http'}"
-      ssl_verify "#{ENV['FLUENTD_ELASTICSEARCH_SSL_VERIFY'] || 'true'}"
-      reload_connections "#{ENV['FLUENTD_ELASTICSEARCH_RELOAD_CONNECTIONS'] || 'true'}"
+      scheme "#{ENV['FLUENTD_ELASTICSEARCH_SCHEME']}"
+      ssl_verify "#{ENV['FLUENTD_ELASTICSEARCH_SSL_VERIFY']}"
+      reload_connections "#{ENV['FLUENTD_ELASTICSEARCH_RELOAD_CONNECTIONS']}"
       type_name message
       tag_key Logger
       include_tag_key true
       time_key Timestamp
       time_key_exclude_timestamp true
-      logstash_format {{ common.addons.fluentd.aggregator.config.output.get('logstash_format', 'true') | lower }}
-      logstash_prefix {{ common.addons.fluentd.aggregator.config.output.get('logstash_prefix', 'log') }}
-      logstash_dateformat {{ common.addons.fluentd.aggregator.config.output.get('logstash_dateformat', '%Y.%m.%d') }}
-      request_timeout {{ common.addons.fluentd.aggregator.config.output.get('request_timeout', '10s') }}
-      buffer_chunk_limit {{ common.addons.fluentd.aggregator.config.output.get('buffer_chunk_limit', '2m') }}
-      buffer_queue_limit {{ common.addons.fluentd.aggregator.config.output.get('buffer_queue_limit', '32') }}
-      flush_interval {{ common.addons.fluentd.aggregator.config.output.get('flush_interval', '10s') }}
-      max_retry_wait {{ common.addons.fluentd.aggregator.config.output.get('max_retry_wait', '30') }}
+      logstash_format {{ common.addons.fluentd.aggregator.config.output.elasticsearch.get('logstash_format') | lower }}
+      logstash_prefix {{ common.addons.fluentd.aggregator.config.output.elasticsearch.get('logstash_prefix') }}
+      logstash_dateformat {{ common.addons.fluentd.aggregator.config.output.elasticsearch.get('logstash_dateformat') }}
+      request_timeout {{ common.addons.fluentd.aggregator.config.output.elasticsearch.get('request_timeout') }}
+      buffer_chunk_limit {{ common.addons.fluentd.aggregator.config.output.elasticsearch.get('buffer_chunk_limit') }}
+      buffer_queue_limit {{ common.addons.fluentd.aggregator.config.output.elasticsearch.get('buffer_queue_limit') }}
+      flush_interval {{ common.addons.fluentd.aggregator.config.output.elasticsearch.get('flush_interval') }}
+      max_retry_wait {{ common.addons.fluentd.aggregator.config.output.elasticsearch.get('max_retry_wait') }}
       disable_retry_limit
-      num_threads {{ common.addons.fluentd.aggregator.config.output.get('num_threads', '8') }}
+      num_threads {{ common.addons.fluentd.aggregator.config.output.elasticsearch.get('num_threads') }}
     </match>

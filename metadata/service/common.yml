@@ -7,6 +7,18 @@ parameters:
   kubernetes:
     common:
       addons:
+        alertmanager:
+          enabled: False
+          image: docker-prod-local.artifactory.mirantis.com/openstack-docker/alertmanager:2018.8.0
+          namespace: stacklight
+          bind:
+            port: 9093
+            address: 0.0.0.0
+          dir:
+            config: /etc/alertmanager
+            data: /data
+            host_config: /srv/volumes/local/alertmanager/config
+            host_data: /srv/volumes/local/alertmanager/data
         dns:
           enabled: true
           replicas: 1
@@ -54,6 +66,61 @@ parameters:
           image: mirantis/external-dns:latest
           domain: ${_param:kubernetes_cluster_domain}
           provider: coredns
+        fluentd:
+          namespace: stacklight
+          enabled: False
+          aggregator:
+            image: docker-prod-local.docker.mirantis.net/mirantis/external/fluentd-kubernetes-daemonset:stable
+            replicas: 1
+            bind:
+              port: 24224
+              host_port: 31950
+            config:
+              config_dir: /fluentd/etc
+              output:
+                elasticsearch:
+                  host: 127.0.0.1
+                  port: 9200
+                  scheme: http
+                  logstash_format: true
+                  logstash_prefix: 'log'
+                  logstash_dateformat: '%Y.%m.%d'
+                  request_timeout: '10s'
+                  buffer_chunk_limit: '2m'
+                  buffer_queue_limit: 32
+                  flush_interval: '10s'
+                  max_retry_wait: 30
+                  num_threads: 8
+                  reload_connections: true
+                  ssl_verify: false
+                  log_level: info
+            resources:
+              requests:
+                memory: 512M
+              limits:
+                memory: 512M
+        prometheus:
+          enabled: False
+          namespace: stacklight
+          server:
+            image: docker-prod-local.artifactory.mirantis.com/openstack-docker/prometheus:2018.8.0
+            replicas: 2
+            bind:
+              host: 0.0.0.0
+              port: 9090
+            config:
+              config_dir: /etc/prometheus
+              data_dir: /data
+              host_config_dir: /srv/volumes/local/prometheus/config
+              host_data_dir: /srv/volumes/local/prometheus/data
+              storage_local_engine: persisted
+              storage_local_retention: 72h
+              use_static_datadir: true
+            resources:
+              requests:
+                memory: 1G
+              limits:
+                memory: 1G
         virtlet:
           enabled: False
           namespace: kube-system

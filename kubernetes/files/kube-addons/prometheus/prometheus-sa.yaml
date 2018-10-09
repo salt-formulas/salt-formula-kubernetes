@@ -6,7 +6,7 @@ metadata:
   labels:
     addonmanager.kubernetes.io/mode: Reconcile
   name: prometheus-server
-  namespace: {{ common.addons.prometheus.get('namespace', 'stacklight') }}
+  namespace: {{ common.addons.prometheus.get('namespace') }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -48,4 +48,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-server
-  namespace: {{ common.addons.prometheus.get('namespace', 'stacklight') }}
+  namespace: {{ common.addons.prometheus.get('namespace') }}

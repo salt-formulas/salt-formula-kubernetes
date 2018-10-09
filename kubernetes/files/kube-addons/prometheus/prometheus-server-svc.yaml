@@ -15,6 +15,6 @@ spec:
   type: LoadBalancer
   ports:
   - name: webui
-    port: {{ common.addons.prometheus.server.bind.get('port', '9090') }}
-    targetPort: {{ common.addons.prometheus.server.bind.get('port', '9090') }}
+    port: {{ common.addons.prometheus.server.bind.get('port') }}
+    targetPort: {{ common.addons.prometheus.server.bind.get('port') }}
     protocol: TCP

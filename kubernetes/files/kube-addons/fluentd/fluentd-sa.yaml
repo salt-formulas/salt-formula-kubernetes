@@ -6,7 +6,7 @@ metadata:
   labels:
     addonmanager.kubernetes.io/mode: Reconcile
   name: fluentd
-  namespace: {{ common.addons.fluentd.get('namespace', 'stacklight') }}
+  namespace: {{ common.addons.fluentd.get('namespace') }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
@@ -39,4 +39,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: fluentd
-  namespace: {{ common.addons.fluentd.get('namespace', 'stacklight') }}
+  namespace: {{ common.addons.fluentd.get('namespace') }}
