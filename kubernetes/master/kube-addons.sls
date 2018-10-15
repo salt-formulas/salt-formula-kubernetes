@@ -209,6 +209,13 @@ addon-dir-create:
 /etc/kubernetes/addons/dns:
   file.absent
 
+kube_dns_service_absent:
+  cmd.run:
+    - name: kubectl -n kube-system delete svc kube-dns > /dev/null || echo "kube-dns is absent. OK" && true
+    {%- if grains.get('noservices') %}
+    - onlyif: /bin/false
+    {%- endif %}
+
 {%- if master.get('federation', {}).get('enabled') or (common.addons.get('externaldns', {}).get('enabled') and common.addons.get('externaldns', {}).get('provider') == "coredns") %}
 /etc/kubernetes/addons/coredns/coredns-etcd-operator-deployment.yaml:
   file.managed:
@@ -279,6 +286,13 @@ addon-dir-create:
 
 /etc/kubernetes/addons/coredns:
   file.absent
+
+core_dns_service_absent:
+  cmd.run:
+    - name: kubectl -n {{ common.addons.get('coredns', {}).get('namespace', 'kube-system') }} delete svc coredns > /dev/null || echo "coredns is absent. OK" && true
+    {%- if grains.get('noservices') %}
+    - onlyif: /bin/false
+    {%- endif %}
 
 /etc/kubernetes/addons/dns/kubedns-svc.yaml:
   file.managed:
