@@ -1,10 +1,16 @@
+{%- from "kubernetes/map.jinja" import common with context -%}
 [Unit]
 Description=Kubernetes Kubelet Server
 Documentation=https://github.com/kubernetes/kubernetes
 Documentation=man:kubelet
 After=network.target
+{%- if common.get('containerd', {}).get('enabled') %}
+After=containerd.service
+Requires=containerd.service
+{%- else %}
 After=docker.service
 Requires=docker.service
+{%- endif %}
 Conflicts=cadvisor.service
 
 [Service]

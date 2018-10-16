@@ -1,0 +1,4 @@
+{%- from "kubernetes/map.jinja" import common with context -%}
+[plugins]
+  [plugins.cri]
+    sandbox_image = "{{ common.hyperkube.pause_image }}"
