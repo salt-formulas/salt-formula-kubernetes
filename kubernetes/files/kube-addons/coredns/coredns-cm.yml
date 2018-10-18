@@ -32,7 +32,11 @@ data:
         cache 30
         reload
         loadbalance
+{%- if common.addons.coredns.domain == "cluster.local"  %}
         kubernetes {{ common.addons.coredns.domain|replace('_', '-') }}. in-addr.arpa ip6.arpa {
+{%- else %}
+        kubernetes {{ common.addons.coredns.domain|replace('_', '-') }}. cluster.local. in-addr.arpa ip6.arpa {
+{%- endif %}
           pods insecure
           upstream
           fallthrough in-addr.arpa ip6.arpa
