@@ -16,12 +16,12 @@ spec:
     command:
     - /hyperkube
     - controller-manager
-      --kubeconfig /etc/kubernetes/controller-manager.kubeconfig
-      --cluster-name=kubernetes
-      --service-account-private-key-file=/etc/kubernetes/ssl/kubernetes-server.key
-      --v={{ master.get('verbosity', 2) }}
-      --root-ca-file=/etc/kubernetes/ssl/ca-{{ master.ca }}.crt
-      --leader-elect=true
+    - --kubeconfig /etc/kubernetes/controller-manager.kubeconfig
+    - --cluster-name=kubernetes
+    - --service-account-private-key-file=/etc/kubernetes/ssl/kubernetes-server.key
+    - --v={{ master.get('verbosity', 2) }}
+    - --root-ca-file=/etc/kubernetes/ssl/ca-{{ master.ca }}.crt
+    - --leader-elect=true
 {%- for key, value in master.get('controller_manager', {}).get('daemon_opts', {}).items() %}
       --{{ key }}={{ value }}
 {%- endfor %}
