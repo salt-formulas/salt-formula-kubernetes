@@ -11,25 +11,9 @@ metadata:
 data:
   Corefile: |
     .:53 {
-{% if master.federation.enabled %}
-        etcd {{ master.federation.name }} {
-          stubzones
-          path /skydns
-          endpoint http://{{ common.addons.coredns.etcd.client_address }}:2379
-        }
-{% endif %}
-{% if common.addons.externaldns.enabled %}
-        etcd {{ common.addons.externaldns.domain }} {
-          stubzones
-          path /skydns
-          endpoint http://{{ common.addons.coredns.etcd.client_address }}:2379
-        }
-{% endif %}
         errors
         log stdout
         health
-        proxy . /etc/resolv.conf
-        cache 30
         reload
         loadbalance
 {%- if common.addons.coredns.domain == "cluster.local"  %}
@@ -39,6 +23,26 @@ data:
 {%- endif %}
           pods insecure
           upstream
+{%- if common.addons.externaldns.enabled and common.addons.externaldns.domain == common.addons.coredns.domain %}
+          fallthrough {{ common.addons.coredns.domain }} in-addr.arpa ip6.arpa
+{%- else %}
           fallthrough in-addr.arpa ip6.arpa
+{%- endif %}
         }
+{%- if master.federation.enabled %}
+        etcd {{ master.federation.name }} {
+          stubzones
+          path /skydns
+          endpoint http://{{ common.addons.coredns.etcd.client_address }}:2379
+        }
+{%- endif %}
+{%- if common.addons.externaldns.enabled %}
+        etcd {{ common.addons.externaldns.domain }} {
+          stubzones
+          path /skydns
+          endpoint http://{{ common.addons.coredns.etcd.client_address }}:2379
+        }
+{%- endif %}
+        proxy . /etc/resolv.conf
+        cache 30
     }
