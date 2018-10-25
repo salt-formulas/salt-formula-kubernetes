@@ -99,7 +99,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(procstat_running{process_name=~\"calico-docker\",host=~\"^$host$\"}) / count(machine_cpu_cores{kubernetes_io_hostname=~\"^$host$\"}) * 100",
+          "expr": "sum(procstat_running{process_name=~\"calico-docker\",host=~\"^$host$\"}) / count(system_n_cpus{host=~\"^$host$\"}) * 100",
           "format": "time_series",
           "interval": "10s",
           "intervalFactor": 2,
@@ -186,7 +186,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(procstat_running{process_name=~\"bird\",host=~\"^$host$\"}) / count(machine_cpu_cores{kubernetes_io_hostname=~\"^$host$\"}) * 100",
+          "expr": "sum(procstat_running{process_name=~\"bird\",host=~\"^$host$\"}) / count(system_n_cpus{host=~\"^$host$\"}) * 100",
           "format": "time_series",
           "interval": "10s",
           "intervalFactor": 2,
@@ -273,7 +273,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(procstat_running{process_name=~\"bird6\",host=~\"^$host$\"}) / count(machine_cpu_cores{kubernetes_io_hostname=~\"^$host$\"}) * 100",
+          "expr": "sum(procstat_running{process_name=~\"bird6\",host=~\"^$host$\"}) / count(system_n_cpus{host=~\"^$host$\"}) * 100",
           "format": "time_series",
           "interval": "10s",
           "intervalFactor": 1,
@@ -360,7 +360,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(procstat_running{process_name=~\"confd\",host=~\"^$host$\"}) / count(machine_cpu_cores{kubernetes_io_hostname=~\"^$host$\"}) * 100",
+          "expr": "sum(procstat_running{process_name=~\"confd\",host=~\"^$host$\"}) / count(system_n_cpus{host=~\"^$host$\"}) * 100",
           "format": "time_series",
           "interval": "10s",
           "intervalFactor": 1,
@@ -447,7 +447,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(procstat_running{process_name=~\"calico-felix\",host=~\"^$host$\"}) / count(machine_cpu_cores{kubernetes_io_hostname=~\"^$host$\"}) * 100",
+          "expr": "sum(procstat_running{process_name=~\"calico-felix\",host=~\"^$host$\"}) / count(system_n_cpus{host=~\"^$host$\"}) * 100",
           "format": "time_series",
           "interval": "10s",
           "intervalFactor": 2,
