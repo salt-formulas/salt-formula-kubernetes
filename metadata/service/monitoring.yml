@@ -3,4 +3,3 @@ parameters:
     common:
       monitoring:
         backend: prometheus
-

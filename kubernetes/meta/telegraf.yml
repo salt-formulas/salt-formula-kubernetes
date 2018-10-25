@@ -1,5 +1,6 @@
 {%- from "kubernetes/map.jinja" import master with context %}
 {%- from "kubernetes/map.jinja" import pool with context %}
+{%- from "kubernetes/map.jinja" import common with context %}
 
 {%- if pool.get('enabled', False) %}
 {% set network = pool.get('network', {}) %}
@@ -9,9 +10,20 @@
 {% endif %}
 {% endif %}
 
+{% set virtlet_enabled = common.get('addons', {}).get('virtlet', {}).get('enabled', False) %}
+
 {%- if master.get('enabled', False) or pool.get('enabled', False) %}
 agent:
   input:
+  {%- if pool.get('enabled', False) %}
+    kubernetes:
+      host: {{ pool.kubelet.address }}
+      template: kubernetes/files/kubernetes_telegraf.conf
+  {%- endif %}
+  {%- if virtlet_enabled and not master.get('enabled', False) %}
+    virtlet:
+      template: kubernetes/files/virtlet_telegraf.conf
+  {%- endif %}
     procstat:
       process:
   {%- if master.get('enabled', False) %}
