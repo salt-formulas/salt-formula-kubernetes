@@ -250,6 +250,7 @@ kubernetes_basic_auth:
 
 /etc/kubernetes/ssl/{{ filename }}:
   file.managed:
+    - create: False
     - user: root
     {%- if pillar.get('haproxy', {}).get('proxy', {}).get('enabled') %}
     - group: haproxy
