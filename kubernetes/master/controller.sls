@@ -250,7 +250,7 @@ kubernetes_basic_auth:
 
 /etc/kubernetes/ssl/{{ filename }}:
   file.managed:
-    - create: False
+    - source: salt://{{ master.get('cert_source','_certs/kubernetes') }}/{{ filename }}
     - user: root
     {%- if pillar.get('haproxy', {}).get('proxy', {}).get('enabled') %}
     - group: haproxy
