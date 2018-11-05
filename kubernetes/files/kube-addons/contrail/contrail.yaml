@@ -48,7 +48,7 @@ spec:
           value: {{ common.addons.get('contrail',{}).get('rabbitmq_erlang_cookie',"YTQMGYEHFATZPDKPOCXX") }}
 
       - name: opencontrail-controller
-        image: docker-prod-local.artifactory.mirantis.com/opencontrail-oc40/opencontrail-controller:{{ common.addons.get('contrail',{}).get('contrail_version',"latest") }}
+        image: {{ common.addons.opencontrail.controller.image }}
         securityContext:
           privileged: true
         env:
@@ -98,7 +98,7 @@ spec:
 
 
       - name: opencontrail-analyticsdb
-        image: docker-prod-local.artifactory.mirantis.com/opencontrail-oc40/opencontrail-analyticsdb:{{ common.addons.get('contrail',{}).get('contrail_version',"latest") }}
+        image: {{ common.addons.opencontrail.analyticsdb.image }}
         securityContext:
           privileged: true
         env:
@@ -139,7 +139,7 @@ spec:
           mountPath: /var/log/journal
 
       - name: opencontrail-analytics
-        image: docker-prod-local.artifactory.mirantis.com/opencontrail-oc40/opencontrail-analytics:{{ common.addons.get('contrail',{}).get('contrail_version',"latest") }}
+        image: {{ common.addons.opencontrail.analytics.image }}
         volumeMounts:
         - name: etc-contrail
           mountPath: /etc/contrail

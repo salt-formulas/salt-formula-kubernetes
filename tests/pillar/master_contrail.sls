@@ -38,6 +38,15 @@ kubernetes:
         enabled: true
         namespace: kube-system
         image: yashulyak/contrail-controller:latest
+      opencontrail:
+        controller:
+          image: docker-prod-local.artifactory.mirantis.com/opencontrail-oc40/opencontrail-controller:latest
+        analyticsdb:
+          image: docker-prod-local.artifactory.mirantis.com/opencontrail-oc40/opencontrail-analyticsdb:latest
+        analytics:
+          image: docker-prod-local.artifactory.mirantis.com/opencontrail-oc40/opencontrail-analytics:latest
+        kube_manager:
+          image: docker-prod-local.artifactory.mirantis.com/opencontrail-oc40/opencontrail-kube-manager:latest
     monitoring:
       backend: prometheus
   master:

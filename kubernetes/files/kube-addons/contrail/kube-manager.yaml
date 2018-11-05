@@ -20,7 +20,7 @@ spec:
       hostNetwork: true
       containers:
       - name: opencontrail-kube-manager
-        image: docker-prod-local.artifactory.mirantis.com/opencontrail-oc40/opencontrail-kube-manager:{{ common.addons.get('contrail',{}).get('contrail_version',"latest") }}
+        image: {{ common.addons.opencontrail.kube_manager.image }}
         securityContext:
           privileged: true
         env:
