@@ -18,51 +18,51 @@ spec:
     command:
     - /hyperkube
     - apiserver
-      --insecure-bind-address={{ master.apiserver.insecure_address }}
-      --etcd-servers={% for member in master.etcd.members %}http://{{ member.host }}:4001{% if not loop.last %},{% endif %}{% endfor %}
-      --admission-control=NamespaceLifecycle,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota
-      --service-cluster-ip-range={{ master.service_addresses }}
+    - --insecure-bind-address={{ master.apiserver.insecure_address }}
+    - --etcd-servers={% for member in master.etcd.members %}http://{{ member.host }}:4001{% if not loop.last %},{% endif %}{% endfor %}
+    - --admission-control=NamespaceLifecycle,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota
+    - --service-cluster-ip-range={{ master.service_addresses }}
       {%- if master.auth.get('ssl', {}).enabled|default(True) %}
-      --client-ca-file={{ master.auth.get('ssl', {}).ca_file|default("/etc/kubernetes/ssl/ca-"+master.ca+".crt") }}
+    - --client-ca-file={{ master.auth.get('ssl', {}).ca_file|default("/etc/kubernetes/ssl/ca-"+master.ca+".crt") }}
       {%- endif %}
       {%- if master.auth.get('proxy', {}).enabled|default(False) %}
-      --requestheader-username-headers={{ master.auth.proxy.header.user }}
-      --requestheader-group-headers={{ master.auth.proxy.header.group }}
-      --requestheader-extra-headers-prefix={{ master.auth.proxy.header.extra }}
-      --requestheader-client-ca-file={{ master.auth.proxy.ca_file|default("/etc/kubernetes/ssl/ca-"+master.ca+".crt") }}
+    - --requestheader-username-headers={{ master.auth.proxy.header.user }}
+    - --requestheader-group-headers={{ master.auth.proxy.header.group }}
+    - --requestheader-extra-headers-prefix={{ master.auth.proxy.header.extra }}
+    - --requestheader-client-ca-file={{ master.auth.proxy.ca_file|default("/etc/kubernetes/ssl/ca-"+master.ca+".crt") }}
       {%- endif %}
-      --anonymous-auth={{ master.auth.get('anonymous', {}).enabled|default(False) }}
+    - --anonymous-auth={{ master.auth.get('anonymous', {}).enabled|default(False) }}
       {%- if master.auth.get('basic', {}).enabled|default(True) %}
-      --basic-auth-file={{ master.auth.basic.file|default("/srv/kubernetes/basic_auth.csv") }}
+    - --basic-auth-file={{ master.auth.basic.file|default("/srv/kubernetes/basic_auth.csv") }}
       {%- endif %}
-      --tls-cert-file=/etc/kubernetes/ssl/kubernetes-server.crt
-      --tls-private-key-file=/etc/kubernetes/ssl/kubernetes-server.key
-      --secure-port={{ master.apiserver.secure_port }}
-      --bind-address={{ master.apiserver.address }}
+    - --tls-cert-file=/etc/kubernetes/ssl/kubernetes-server.crt
+    - --tls-private-key-file=/etc/kubernetes/ssl/kubernetes-server.key
+    - --secure-port={{ master.apiserver.secure_port }}
+    - --bind-address={{ master.apiserver.address }}
       {%- if master.auth.get('token', {}).enabled|default(True) %}
-      --token-auth-file={{ master.auth.token.file|default("/srv/kubernetes/known_tokens.csv") }}
+    - --token-auth-file={{ master.auth.token.file|default("/srv/kubernetes/known_tokens.csv") }}
       {%- endif %}
-      --etcd-quorum-read=true
-      --v={{ master.get('verbosity', 2) }}
-      --allow-privileged=True
+    - --etcd-quorum-read=true
+    - --v={{ master.get('verbosity', 2) }}
+    - --allow-privileged=True
       {%- if common.addons.get('virtlet', {}).get('enabled') %}
       {%- if salt['pkg.version_cmp'](version,'1.8') >= 0 %}
-        --feature-gates=MountPropagation=true
+    - --feature-gates=MountPropagation=true
       {%- endif %}
       {%- if salt['pkg.version_cmp'](version,'1.9') >= 0 %}
-      --endpoint-reconciler-type={{ master.apiserver.get('endpoint-reconciler', 'lease') }}
+    - --endpoint-reconciler-type={{ master.apiserver.get('endpoint-reconciler', 'lease') }}
       {%- else %}
-      --apiserver-count={{ master.apiserver.get('count', 1) }}
+    - --apiserver-count={{ master.apiserver.get('count', 1) }}
       {%- endif %}
       {%- endif %}
       {%- if master.auth.get('mode') %}
-      --authorization-mode={{ master.auth.mode }}
+    - --authorization-mode={{ master.auth.mode }}
       {%- endif %}
 {%- if master.apiserver.node_port_range is defined %}
-      --service-node-port-range {{ master.apiserver.node_port_range }}
+    - --service-node-port-range {{ master.apiserver.node_port_range }}
 {%- endif %}
 {%- for key, value in master.get('apiserver', {}).get('daemon_opts', {}).items() %}
-      --{{ key }}={{ value }}
+    - --{{ key }}={{ value }}
 {% endfor %}
       1>>/var/log/kube-apiserver.log 2>&1
     imagePullPolicy: IfNotPresent

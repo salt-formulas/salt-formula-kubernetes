@@ -16,16 +16,16 @@ spec:
     command:
     - /hyperkube
     - proxy
-      --logtostderr=true
-      --v={{ pool.get('verbosity', 2) }}
-      --kubeconfig=/etc/kubernetes/proxy.kubeconfig
-      --master={%- if pool.apiserver.insecure.enabled %}http://{{
+    - --logtostderr=true
+    - --v={{ pool.get('verbosity', 2) }}
+    - --kubeconfig=/etc/kubernetes/proxy.kubeconfig
+    - --master={%- if pool.apiserver.insecure.enabled %}http://{{
 pool.apiserver.host }}:{{ pool.apiserver.insecure_port }}{%- else %}https://{{ pool.apiserver.host }}:{{ pool.apiserver.secure_port }}{%- endif %}
 {%- if pool.network.get('calico', {}).get('enabled', False) %}
-      --proxy-mode=iptables
+    - --proxy-mode=iptables
 {%- endif %}
 {%- for key, value in pool.get('proxy', {}).get('daemon_opts', {}).items() %}
-      --{{ key }}={{ value }}
+    - --{{ key }}={{ value }}
 {%- endfor %}
       1>>/var/log/kube-proxy.log 2>&1
     securityContext:
