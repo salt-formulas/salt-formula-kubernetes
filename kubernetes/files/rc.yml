@@ -7,7 +7,9 @@ metadata:
   labels:
     app: {{ service.service }}-{{ service.role }}
 spec:
+  {%- if service.replicas is defined %}
   replicas: {{ service.replicas }}
+  {%- endif %}
   {%- if service.kind == 'PetSet' %}
   serviceName: {{ service.service_name }}
   {%- endif %}
